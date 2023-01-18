@@ -2,7 +2,12 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.request import urlopen
 import json
 
-DATA_SERVERS = ["http://localhost:8008"]
+DATA_SERVERS = [
+        "http://localhost:8008",
+        "http://localhost:8009",
+        "http://localhost:8010",
+        "http://localhost:8011"
+    ]
 
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
