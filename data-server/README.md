@@ -5,8 +5,13 @@ Serve JSON over HTTP
 ## Getting started
 Start the server:
 ```
-Make start
+make start p=PORT f=filename
+make start1
+make start2
+make start3
+make start4
 ```
+You can modify the `Makefile` to adjust ports and files to serve.
 
 ### GET
 HTTP GET a JSON response of `data.json`:
