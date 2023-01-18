@@ -1,2 +1,2 @@
 start:
-	python ./data-server.py
+	python3 ./data-server.py
