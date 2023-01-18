@@ -1,11 +1,11 @@
 start:
 	python3 ./msn-server.py
 
-testget:
+get:
 	curl http://localhost:8888
 
-testfetch:
+fetch:
 	curl -d "fetch" http://localhost:8888
 
-testreset:
+reset:
 	curl -d "reset" http://localhost:8888
