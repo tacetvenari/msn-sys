@@ -42,6 +42,13 @@ class Server(BaseHTTPRequestHandler):
                 self.wfile.write("{\"mission_fetch\": \"complete\"}".encode('utf-8'))
                 msn_data_file.close()
 
+        elif post_data == "reset":
+            with open('msn-data.json', 'w') as msn_data_file:
+                msn_data_file.write(f"[]")
+                self._set_headers()
+                self.wfile.write("{\"reset\": \"complete\"}".encode('utf-8'))
+                msn_data_file.close()
+
 def run(server_class=HTTPServer, handler_class=Server, port=8888):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
