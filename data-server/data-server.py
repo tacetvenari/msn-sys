@@ -12,7 +12,11 @@ class Server(BaseHTTPRequestHandler):
 
     # GET sends back a Hello world message
     def do_GET(self):
-        with open('data.json') as file:
+        filename = "data1.json"
+        if len(argv) > 2:
+            filename = argv[2]
+
+        with open(filename) as file:
             data = json.load(file)
 
             self._set_headers()
@@ -40,8 +44,9 @@ def run(server_class=HTTPServer, handler_class=Server, port=8008):
 
 if __name__ == "__main__":
     from sys import argv
+    args = len(argv)
 
-    if len(argv) == 2:
+    if args > 1:
         run(port=int(argv[1]))
     else:
         run()
