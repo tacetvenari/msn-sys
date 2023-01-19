@@ -5,7 +5,7 @@ export default function StatusListItem({status}){
   return (
     <HStack spacing={4}>
       <Circle size={8} bg="green.500" />
-      <Heading textTransform="uppercase">{status.label}</Heading>
+      <Heading textTransform="uppercase" letterSpacing={8}>{status.label}</Heading>
     </HStack>
   )
 }
