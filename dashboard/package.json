@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview"
   },
@@ -12,6 +12,8 @@
     "@chakra-ui/react": "^2.4.4",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
+    "@tanstack/react-router": "^0.0.1-beta.52",
+    "axios": "^1.2.3",
     "framer-motion": "^6.5.1",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",

@@ -1,10 +1,13 @@
-import AircraftList from './AircraftList'
-import Layout from './Layout'
+import {
+  RouterProvider,
+  ReactRouter,
+} from '@tanstack/react-router'
+import routeConfig from './routeConfig'
+
+const router = new ReactRouter({ routeConfig })
 
 export default function App() {
   return (
-    <Layout>
-      <AircraftList />
-    </Layout>
+    <RouterProvider router={router} />
   )
 }
