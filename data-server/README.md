@@ -1,5 +1,4 @@
 # Data Server
-
 Serve JSON over HTTP
 
 ## Getting started
