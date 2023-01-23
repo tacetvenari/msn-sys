@@ -1,6 +1,9 @@
 start:
 	python3 ./msn-server.py
 
+ws:
+	python3 ./msn-ws-server.py
+
 get:
 	curl http://localhost:8888
 

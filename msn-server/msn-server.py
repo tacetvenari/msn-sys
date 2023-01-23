@@ -53,7 +53,7 @@ def run(server_class=HTTPServer, handler_class=Server, port=8888):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
-    print('Starting httpd on port %d...' % port)
+    print(f'Starting httpd on port {port}...')
     httpd.serve_forever()
 
 if __name__ == "__main__":
