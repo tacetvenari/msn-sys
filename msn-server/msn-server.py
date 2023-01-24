@@ -12,22 +12,27 @@ DATA_SERVERS = [
     "http://localhost:8011"
 ]
 
-connected = set()
+# Connection channels
+connections = {
+    '/controller': set(),
+    '/dashboard': set()
+}
 
-async def socket_handler(websocket):
+async def socket_handler(websocket, path):
+
     # Register connection
-    connected.add(websocket)
+    connections[path].add(websocket)
 
     try:
         async for message in websocket:
             print(f"Received message: {message}")
             # Determine action based on message
-            if message == "get":
+            if message == "publish":
                 with open(MSN_DATA_FILE) as file:
                     data = json.load(file)
-                    websockets.broadcast(connected, str(data))
+                    websockets.broadcast(connections['/dashboard'], str(data))
                     file.close()
-            elif message == "fetch":
+            elif message == "build":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[\n")
                     for idx, data_server in enumerate(DATA_SERVERS):
@@ -38,18 +43,16 @@ async def socket_handler(websocket):
                             msn_data_file.write(f"{content},\n")
                     msn_data_file.write(f"]\n")
                     msn_data_file.close()
-                websockets.broadcast(connected, "{'fetched': true}")
+                websockets.broadcast(connections['/controller'], "{'fetched': true}")
             elif message == "reset":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
-                websockets.broadcast(connected, "{'reset': true}")
-            #else:
-            #    websockets.broadcast(connected, f"Command '{message}' not recognized...")
+                websockets.broadcast(connections['/controller'], "{'reset': true}")
 
     finally:
         # Unregister connection
-        connected.remove(websocket)
+        connections[path].remove(websocket)
 
 async def main(port=8888):
     print(f'Starting websocket server on port {port}...')

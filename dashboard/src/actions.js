@@ -1,26 +1,27 @@
-function handleCompileMission(){
+
+function handleCompileMission(send){
   // Send post fetch to mission server
-  console.log("!")
+  send('build')
 }
 
-function handlePublishMission(){
+function handlePublishMission(send){
   // Fetch mission server from dashboard
-  console.log("!")
+  send('publish')
 }
 
-function handleLaunchSortie(){
+function handleLaunchSortie(send){
   // Start sortie timers
-  console.log("!")
+  send('launch')
 }
 
-function handleCancelSortie(){
+function handleCancelSortie(send){
   // Cancel sortie timers
-  console.log("!")
+  send('cancel')
 }
 
-function handleResetMission(){
+function handleResetMission(send){
   // Clear mission server data
-  console.log("!")
+  send('reset')
 }
 
 export default [
