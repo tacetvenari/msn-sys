@@ -1,19 +1,25 @@
+import PropTypes from 'prop-types'
 import { HStack } from '@chakra-ui/react'
 import AircraftCard from './AircraftCard'
 
-const aircraft = [
-  "TV-01",
-  "TV-02",
-  "TV-05",
-  "TV-06",
-]
+export default function AircraftList({aircraft, mxData}){
+  const getMxData = (currentAircraft) => mxData.find(item => item.tailnumber === currentAircraft)
 
-export default function AircraftList(){
   return (
     <HStack px={8}>
-      {aircraft.map(item => (
-          <AircraftCard key={`${item}-card`} aircraft={item} />
-        ))}
+      {aircraft.map(item => {
+        const aircraftData = getMxData(item) 
+
+        return (
+          <AircraftCard key={`${item}-card`} aircraft={item} data={aircraftData} />
+        )})}
     </HStack>
   )
+}
+
+AircraftList.propTypes = {
+  aircraft: PropTypes.arrayOf(PropTypes.string).isRequired,
+  mxData: PropTypes.arrayOf(PropTypes.shape({
+    tailNumber: PropTypes.string
+  })).isRequired,
 }

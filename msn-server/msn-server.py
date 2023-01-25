@@ -30,7 +30,8 @@ async def socket_handler(websocket, path):
             if message == "publish":
                 with open(MSN_DATA_FILE) as file:
                     data = json.load(file)
-                    websockets.broadcast(connections['/dashboard'], str(data))
+                    websockets.broadcast(connections['/dashboard'], json.dumps(data))
+                    websockets.broadcast(connections['/controller'], "{'publish': true}")
                     file.close()
             elif message == "build":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
@@ -43,7 +44,7 @@ async def socket_handler(websocket, path):
                             msn_data_file.write(f"{content},\n")
                     msn_data_file.write(f"]\n")
                     msn_data_file.close()
-                websockets.broadcast(connections['/controller'], "{'fetched': true}")
+                websockets.broadcast(connections['/controller'], "{'build': true}")
             elif message == "reset":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")

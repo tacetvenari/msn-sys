@@ -1,18 +1,22 @@
 import PropTypes from 'prop-types'
 import { Circle, Heading, HStack } from '@chakra-ui/react'
 
-export default function StatusListItem({status}){
+export default function StatusListItem({label, value}){
+  const statusColor = {
+    "good": "green.500",
+    "bad": "red.500",
+    "unk": "gray.500"
+  }
+
   return (
     <HStack spacing={4}>
-      <Circle size={8} bg="green.500" />
-      <Heading textTransform="uppercase" letterSpacing={8}>{status.label}</Heading>
+      <Circle size={8} bg={statusColor[value]} />
+      <Heading textTransform="uppercase" letterSpacing={8}>{label}</Heading>
     </HStack>
   )
 }
 
 StatusListItem.propTypes = {
-  status: PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    state: PropTypes.string.isRequired
-  }).isRequired
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired
 }

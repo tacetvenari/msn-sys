@@ -1,21 +1,24 @@
+import PropTypes from 'prop-types'
 import { Stack, StackDivider } from '@chakra-ui/react'
 import StatusListItem from './StatusListItem'
 
-const statuses = [
-  { label: "nav", state: "good" },
-  { label: "hyd", state: "good" },
-  { label: "fuel", state: "good" },
-  { label: "rad", state: "good" },
-  { label: "wpn", state: "good" },
-  { label: "lo", state: "good" },
-]
+const statuses = ["nav", "hyd", "fuel", "rad", "wpn", "lo"]
 
-export default function StatusList(){
+export default function StatusList({data}){  
   return (
     <Stack divider={<StackDivider />}>
-      {statuses.map(status => (
-          <StatusListItem key={`${status.label}-item`} status={status} />
-        ))}
+      {statuses.map(status => {
+        const value = data[status] || "unk"
+
+         return (
+          <StatusListItem key={`${status}-item`} label={status} value={value} />
+        )})}
     </Stack>
   )
+}
+
+StatusList.propTypes = {
+  data: PropTypes.shape({
+    nav: PropTypes.string
+  }).isRequired
 }
