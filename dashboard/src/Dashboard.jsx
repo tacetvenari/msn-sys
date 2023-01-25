@@ -6,13 +6,7 @@ import Layout from './Layout'
 export default function Dashboard(){
   const { lastMessage, readyState } = useWebSocket('ws://localhost:8888/dashboard');
   
-  const connectionStatus = {
-    [ReadyState.CONNECTING]: 'Connecting',
-    [ReadyState.OPEN]: 'Open',
-    [ReadyState.CLOSING]: 'Closing',
-    [ReadyState.CLOSED]: 'Closed',
-    [ReadyState.UNINSTANTIATED]: 'Uninstantiated',
-  }[readyState];
+  const connectionStatus = ReadyState[readyState]
 
   React.useEffect(() => {
     console.log(`state: ${connectionStatus}`)
