@@ -7,11 +7,11 @@ export default function AircraftList({aircraft, mxData}){
 
   return (
     <HStack px={8}>
-      {aircraft.map(item => {
+      {aircraft.map((item, idx) => {
         const aircraftData = getMxData(item) 
 
         return (
-          <AircraftCard key={`${item}-card`} aircraft={item} data={aircraftData} />
+          <AircraftCard key={`${item}-card`} aircraft={item} data={aircraftData} idx={idx} />
         )})}
     </HStack>
   )

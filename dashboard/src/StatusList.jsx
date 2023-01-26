@@ -4,21 +4,27 @@ import StatusListItem from './StatusListItem'
 
 const statuses = ["nav", "hyd", "fuel", "rad", "wpn", "lo"]
 
-export default function StatusList({data}){  
+export default function StatusList({data, delay}){  
   return (
     <Stack divider={<StackDivider />}>
-      {statuses.map(status => {
+      {statuses.map((status, idx) => {
         const value = data[status] || "unk"
+        const combinedDelay = (idx * 0.5) + delay
 
          return (
-          <StatusListItem key={`${status}-item`} label={status} value={value} />
+          <StatusListItem key={`${status}-item`} label={status} value={value} delay={combinedDelay} />
         )})}
     </Stack>
   )
 }
 
+StatusList.defaultProps = {
+  delay: 0
+}
+
 StatusList.propTypes = {
   data: PropTypes.shape({
     nav: PropTypes.string
-  }).isRequired
+  }).isRequired,
+  delay: PropTypes.number
 }
