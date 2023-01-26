@@ -12,12 +12,9 @@ class Server(BaseHTTPRequestHandler):
 
     # GET sends back a Hello world message
     def do_GET(self):
-        filename = "data1.json"
-        if len(argv) > 2:
-            filename = argv[2]
-
-        with open(filename) as file:
+        with open('msn-data.json') as file:
             data = json.load(file)
+            data['tailnumber'] = TAILNUMBER
 
             self._set_headers()
             self.wfile.write(json.dumps(data).encode('utf-8'))
@@ -27,26 +24,29 @@ class Server(BaseHTTPRequestHandler):
     def do_POST(self):
         with open('log', 'a') as log:
             content = self.rfile.read(int(self.headers.get('Content-Length')))
-            log.write(f"{content.decode()}\n")
+            log.write(f'{content.decode()}\n')
 
             self._set_headers()
             self.wfile.write(content)
 
             log.close()
 
-
-def run(server_class=HTTPServer, handler_class=Server, port=8008):
+def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='tv-01'):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
     print('Starting httpd on port %d...' % port)
     httpd.serve_forever()
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     from sys import argv
     args = len(argv)
 
-    if args > 1:
-        run(port=int(argv[1]))
-    else:
-        run()
+    try:
+        PORT = int(argv[1])
+        TAILNUMBER = str(argv[2])
+        run(port=PORT, tailnumber=TAILNUMBER)
+
+    except:
+        print('Missing args:')
+        print('> python3 data-server.py [PORT] [TAILNUMBER]')
