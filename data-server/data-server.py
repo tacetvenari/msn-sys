@@ -12,7 +12,12 @@ class Server(BaseHTTPRequestHandler):
 
     # GET sends back a Hello world message
     def do_GET(self):
-        with open('msn-data.json') as file:
+        files = {
+            "/": "msn-data.json",
+            "/return": "return-data.json"
+        }
+
+        with open(files[self.path]) as file:
             data = json.load(file)
             data['tailnumber'] = TAILNUMBER
 

@@ -14,6 +14,11 @@ function handleLaunchSortie(send){
   send('launch')
 }
 
+function handleReturnSortie(send){
+  // Start sortie timers
+  send('return')
+}
+
 function handleCancelSortie(send){
   // Cancel sortie timers
   send('cancel')
@@ -39,6 +44,11 @@ export default [
     label: "Launch Sortie",
     desc: "Start the sortie timers",
     handler: handleLaunchSortie
+  },
+  { 
+    label: "Return Sortie",
+    desc: "Build the return sortie MX data",
+    handler: handleReturnSortie
   },
   { 
     label: "Cancel Sortie",

@@ -18,8 +18,21 @@ connections = {
     '/dashboard': set()
 }
 
-async def socket_handler(websocket, path):
+def build_msn_data(path='/'):
+    with open(MSN_DATA_FILE, 'w') as msn_data_file:
+        msn_data_file.write(f"[\n")
+        for idx, data_server in enumerate(DATA_SERVERS):
+            content = urlopen(f"{data_server}{path}").read().decode()
+            if (idx + 1) == len(DATA_SERVERS):
+                msn_data_file.write(f"{content}\n")
+            else:
+                msn_data_file.write(f"{content},\n")
+        msn_data_file.write(f"]\n")
+        msn_data_file.close()
+    websockets.broadcast(connections['/controller'], "{'build': true}")
 
+
+async def socket_handler(websocket, path):
     # Register connection
     connections[path].add(websocket)
 
@@ -34,17 +47,9 @@ async def socket_handler(websocket, path):
                     websockets.broadcast(connections['/controller'], "{'publish': true}")
                     file.close()
             elif message == "build":
-                with open(MSN_DATA_FILE, 'w') as msn_data_file:
-                    msn_data_file.write(f"[\n")
-                    for idx, data_server in enumerate(DATA_SERVERS):
-                        content = urlopen(data_server).read().decode()
-                        if (idx + 1) == len(DATA_SERVERS):
-                            msn_data_file.write(f"{content}\n")
-                        else:
-                            msn_data_file.write(f"{content},\n")
-                    msn_data_file.write(f"]\n")
-                    msn_data_file.close()
-                websockets.broadcast(connections['/controller'], "{'build': true}")
+                build_msn_data()
+            elif message == "return":
+                build_msn_data('/return')
             elif message == "reset":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
