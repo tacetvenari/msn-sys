@@ -1,8 +1,9 @@
 from sys import argv
 from urllib.request import urlopen
 import asyncio
-import websockets
 import json
+import socket
+import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
 DATA_SERVERS = [
@@ -61,8 +62,9 @@ async def socket_handler(websocket, path):
         connections[path].remove(websocket)
 
 async def main(port=8888):
-    print(f'Starting websocket server on port {port}...')
-    async with websockets.serve(socket_handler, "localhost", port):
+    local_ip = socket.gethostbyname(socket.getfqdn())
+    print(f'Starting websocket server at {local_ip}:{port}...')
+    async with websockets.serve(socket_handler, "192.168.0.88", port):
         await asyncio.Future()  # run forever
 
 

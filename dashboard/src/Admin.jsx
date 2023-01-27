@@ -15,6 +15,7 @@ import {
 } from '@chakra-ui/react'
 import actions from './actions'
 
+const {VITE_LOCAL_IP, VITE_WS_PORT, VITE_WS_PATH} = import.meta.env
 const servers = ["Data Server 1", "Data Server 2", "Data Server 3", "Data Server 4", "Mission Server"]
 
 function ServerStatus({label}){
@@ -45,11 +46,7 @@ ActionButton.propTypes = {
 }
 
 export default function Admin(){
-  const { sendMessage, lastMessage, readyState } = useWebSocket('ws://localhost:8888/controller');
-
-  React.useEffect(() => {
-    console.log(readyState)
-  }, [readyState])
+  const { sendMessage, lastMessage } = useWebSocket(`ws://${VITE_LOCAL_IP}:${VITE_WS_PORT}${VITE_WS_PATH}`);
 
   React.useEffect(() => {
     console.log(lastMessage)
