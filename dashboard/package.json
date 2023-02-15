@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_LOCAL_IP=$(ifconfig en0 | grep -i mask | awk '{print $2}') vite --host",
+    "dev": "VITE_LOCAL_IP=$(ifconfig en0 | awk '/inet / {print $2}') vite --host",
     "build": "vite build",
     "preview": "vite preview"
   },
