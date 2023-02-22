@@ -4,8 +4,8 @@ WS_PORT=8888
 start:
 	python3 ./mx-api-server.py ${LOCAL_IP} ${WS_PORT}
 
-controller:
-	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/controller
+control:
+	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/mx-controller
 
-dashboard:
-	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/dashboard
+dash:
+	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/mx-dashboard

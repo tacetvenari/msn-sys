@@ -7,30 +7,39 @@ import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
 DATA_SERVERS = [
-    "http://localhost:8008",
-    "http://localhost:8009",
-    "http://localhost:8010",
-    "http://localhost:8011"
+    "http://localhost:8012",
+    "http://localhost:8013",
+    "http://localhost:8014",
+    "http://localhost:8015",
+    "http://localhost:8016",
+    "http://localhost:8017"
 ]
 
 # Connection channels
 connections = {
-    '/controller': set(),
-    '/dashboard': set()
+    '/msn-controller': set(),
+    '/msn-dashboard': set()
 }
 
 def build_msn_data(path='/'):
     with open(MSN_DATA_FILE, 'w') as msn_data_file:
-        msn_data_file.write(f"[\n")
+        data = {}
         for idx, data_server in enumerate(DATA_SERVERS):
             content = urlopen(f"{data_server}{path}").read().decode()
-            if (idx + 1) == len(DATA_SERVERS):
-                msn_data_file.write(f"{content}\n")
-            else:
-                msn_data_file.write(f"{content},\n")
-        msn_data_file.write(f"]\n")
+            json_data = json.loads(content)
+
+            key = list(json_data.keys())[0] # Grab the first key (shop name)
+
+            # Pull target from intel
+            if key == 'intel':
+                data['target'] = json_data[key]['target']
+
+            json_data[key].pop('target') # Remove target before writing to data
+            data[key] = json_data[key]
+
+        msn_data_file.write(json.dumps(data))
         msn_data_file.close()
-    websockets.broadcast(connections['/controller'], "{'build': true}")
+    websockets.broadcast(connections['/msn-controller'], "{'build': true}")
 
 
 async def socket_handler(websocket, path):
@@ -44,8 +53,8 @@ async def socket_handler(websocket, path):
             if message == "publish":
                 with open(MSN_DATA_FILE) as file:
                     data = json.load(file)
-                    websockets.broadcast(connections['/dashboard'], json.dumps(data))
-                    websockets.broadcast(connections['/controller'], "{'publish': true}")
+                    websockets.broadcast(connections['/msn-dashboard'], json.dumps(data))
+                    websockets.broadcast(connections['/msn-controller'], "{'publish': true}")
                     file.close()
             elif message == "build":
                 build_msn_data()
@@ -55,22 +64,20 @@ async def socket_handler(websocket, path):
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
-                websockets.broadcast(connections['/controller'], "{'reset': true}")
+                websockets.broadcast(connections['/msn-controller'], "{'reset': true}")
 
     finally:
         # Unregister connection
         connections[path].remove(websocket)
 
-async def main(port=8888):
-    #local_ip = socket.gethostbyname(socket.getfqdn())
-    local_ip = '192.168.0.101'
+async def main(local_ip='localhost', port=8888):
     print(f'Starting websocket server at {local_ip}:{port}...')
     async with websockets.serve(socket_handler, local_ip, port):
         await asyncio.Future()  # run forever
 
 
 if __name__ == "__main__":
-    if len(argv) == 2:
-        asyncio.run(main(port=int(argv[1])))
+    if len(argv) == 3:
+        asyncio.run(main(local_ip=argv[1], port=int(argv[2])))
     else:
         asyncio.run(main())

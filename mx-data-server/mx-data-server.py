@@ -41,12 +41,11 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
-    print('Starting httpd on port %d...' % port)
+    print('Starting MX Data Server on port %d...' % port)
     httpd.serve_forever()
 
 if __name__ == '__main__':
     from sys import argv
-    args = len(argv)
 
     try:
         PORT = int(argv[1])

@@ -14,12 +14,11 @@ class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         files = {
             "/": "msn-data.json",
-            "/return": "return-data.json"
         }
 
         with open(files[self.path]) as file:
-            data = json.load(file)
-            data['tailnumber'] = TAILNUMBER
+            data = {}
+            data[SHOP] = json.load(file)
 
             self._set_headers()
             self.wfile.write(json.dumps(data).encode('utf-8'))
@@ -36,22 +35,21 @@ class Server(BaseHTTPRequestHandler):
 
             log.close()
 
-def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='tv-01'):
+def run(server_class=HTTPServer, handler_class=Server, port='8008', shop='unk'):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
-    print('Starting httpd on port %d...' % port)
+    print('Starting %s Data Server on port %d...' % (shop.upper(), port))
     httpd.serve_forever()
 
 if __name__ == '__main__':
     from sys import argv
-    args = len(argv)
 
     try:
         PORT = int(argv[1])
-        TAILNUMBER = str(argv[2])
-        run(port=PORT, tailnumber=TAILNUMBER)
+        SHOP = str(argv[2])
+        run(port=PORT, shop=SHOP)
 
     except:
         print('Missing args:')
-        print('> python3 data-server.py [PORT] [TAILNUMBER]')
+        print('> python3 data-server.py [PORT] [SHOP]')

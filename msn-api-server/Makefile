@@ -1,12 +1,11 @@
-#LOCAL_IP=$(ipconfig en0 | grep -i mask | awk '{print $2}')
-LOCAL_IP=192.168.0.88
-WS_PORT=8888
+LOCAL_IP=$$(ifconfig en0 | awk '/inet / {print $$2}')
+WS_PORT=8889
 
 start:
-	python3 ./msn-server.py
+	python3 ./msn-api-server.py ${LOCAL_IP} ${WS_PORT}
 
-controller:
-	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/controller
+control:
+	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/msn-controller
 
-dashboard:
-	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/dashboard
+dash:
+	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/msn-dashboard

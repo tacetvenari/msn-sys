@@ -16,8 +16,8 @@ DATA_SERVERS = [
 
 # Connection channels
 connections = {
-    '/controller': set(),
-    '/dashboard': set()
+    '/mx-controller': set(),
+    '/mx-dashboard': set()
 }
 
 def build_msn_data(path='/'):
@@ -31,7 +31,7 @@ def build_msn_data(path='/'):
                 msn_data_file.write(f"{content},\n")
         msn_data_file.write(f"]\n")
         msn_data_file.close()
-    websockets.broadcast(connections['/controller'], "{'build': true}")
+    websockets.broadcast(connections['/mx-controller'], "{'build': true}")
 
 
 async def socket_handler(websocket, path):
@@ -45,8 +45,8 @@ async def socket_handler(websocket, path):
             if message == "publish":
                 with open(MSN_DATA_FILE) as file:
                     data = json.load(file)
-                    websockets.broadcast(connections['/dashboard'], json.dumps(data))
-                    websockets.broadcast(connections['/controller'], "{'publish': true}")
+                    websockets.broadcast(connections['/mx-dashboard'], json.dumps(data))
+                    websockets.broadcast(connections['/mx-controller'], "{'publish': true}")
                     file.close()
             elif message == "build":
                 build_msn_data()
@@ -56,7 +56,7 @@ async def socket_handler(websocket, path):
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
-                websockets.broadcast(connections['/controller'], "{'reset': true}")
+                websockets.broadcast(connections['/mx-controller'], "{'reset': true}")
 
     finally:
         # Unregister connection

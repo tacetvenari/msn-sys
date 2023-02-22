@@ -1,6 +1,1 @@
-[
-{"nav": "good", "hyd": "good", "fuel": "good", "rad": "good", "wpn": "good", "lo": "good", "tailnumber": "tv-01"},
-{"nav": "good", "hyd": "good", "fuel": "good", "rad": "good", "wpn": "good", "lo": "good", "tailnumber": "tv-02"},
-{"nav": "good", "hyd": "good", "fuel": "good", "rad": "good", "wpn": "good", "lo": "good", "tailnumber": "tv-05"},
-{"nav": "good", "hyd": "good", "fuel": "good", "rad": "good", "wpn": "good", "lo": "good", "tailnumber": "tv-06"}
-]
+{"bcd": {"status": "good"}, "gccs": {"status": "good"}, "iamd": {"status": "good"}, "target": "staging area", "intel": {"status": "good"}, "freq": {"status": "good"}, "wx": {"status": "good"}}
