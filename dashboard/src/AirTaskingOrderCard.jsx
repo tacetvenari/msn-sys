@@ -13,7 +13,7 @@ const {VITE_MSN_NUMBER, VITE_MSN_PLATFORM, VITE_MSN_TAKEOFF, VITE_MSN_RETURN, VI
 const SHOPS = VITE_SHOPS.split(' ')
 
 function MetaSection({label, value}){
-  const metaFontSize = "1.5em"
+  const metaFontSize = "1.2em"
   return (
     <HStack>
       <Text fontSize={metaFontSize} fontWeight="bold">{`${label}:`}</Text>
@@ -58,8 +58,8 @@ function Status({label, state, delay}){
 
   return (
     <HStack>
-      <Circle size={10} bg={statusColor[state]} transition={`all 0.5s ${delay}s`} />
-      <Text fontSize="2em" fontWeight="bold">{label.toUpperCase()}</Text>
+      <Circle size={6} bg={statusColor[state]} transition={`all 0.5s ${delay}s`} />
+      <Text fontSize="1.8em" fontWeight="bold">{label.toUpperCase()}</Text>
     </HStack>
   )
 }
@@ -75,7 +75,7 @@ function MissionStatus({states}){
     <Stack>
       <Heading size="md">Mission Status</Heading>
       <Divider />
-      <HStack justifyContent="center" spacing={8}>
+      <HStack justifyContent="center" spacing={6}>
         {SHOPS.map((shop, idx) => {
           const currentState = states[shop] ? states[shop].status : 'unk'
           const delay = idx * 0.5
