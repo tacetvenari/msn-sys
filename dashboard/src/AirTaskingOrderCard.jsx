@@ -51,9 +51,6 @@ MissionMeta.propTypes = {
 }
 
 function Status({label, state, delay}){
-  // TODO: Set timeout to remove animation so it reruns on rerender
-  // Random key is not viable - prevents transition from occurring
-
   const statusColor = {
     "good": "green.500",
     "unk": "gray.500"
