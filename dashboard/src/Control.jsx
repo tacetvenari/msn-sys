@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import useWebSocket from 'react-use-websocket'
 import {
   Button,
   Card,
@@ -14,6 +13,7 @@ import {
 } from '@chakra-ui/react'
 import msnActions from './msnActions'
 import mxActions from './mxActions'
+import usePersistentSocket from './usePersistentSocket'
 
 import ConnectionStatus from './ConnectionStatus'
 
@@ -41,17 +41,10 @@ ActionButton.propTypes = {
 }
 
 function ActionsCard({title, actions, wsUrl}){
-  const didUnmount = React.useRef(false)
-  const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl,{
-    shouldReconnect: () => didUnmount.current === false,
-    reconnectAttempts: 10,
-    reconnectInterval: 1000
-  });
-
-  React.useEffect(() => () => didUnmount.current === true)
+  const { sendMessage, lastMessage, connectionStatus } = usePersistentSocket(wsUrl);
 
   React.useEffect(() => {
-    console.log(lastMessage)
+    if(lastMessage) console.log(lastMessage)
   }, [lastMessage])
 
   return (
@@ -59,7 +52,7 @@ function ActionsCard({title, actions, wsUrl}){
       <CardBody>
         <Stack>
           <HStack>
-            <ConnectionStatus readyState={readyState} />
+            <ConnectionStatus state={connectionStatus} />
             <Heading size="md">{title}</Heading>
           </HStack>
           <HStack>
