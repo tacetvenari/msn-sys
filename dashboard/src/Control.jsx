@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardBody,
-  Circle,
   Flex,
   Heading,
   HStack,
@@ -16,6 +15,8 @@ import {
 import msnActions from './msnActions'
 import mxActions from './mxActions'
 
+import ConnectionStatus from './ConnectionStatus'
+
 const {
   VITE_WS_MX_URI,
   VITE_WS_MX_PORT,
@@ -24,20 +25,6 @@ const {
   VITE_WS_MSN_PORT,
   VITE_WS_MSN_CONTROL_PATH,
 } = import.meta.env
-const servers = ["MX Server", "MSN Server"]
-
-function ServerStatus({label}){
-  return (
-    <HStack align="center">
-      <Circle size={3} bg="green" />
-      <Text>{label}</Text>
-    </HStack>
-  )
-}
-
-ServerStatus.propTypes = {
-  label: PropTypes.string.isRequired
-}
 
 function ActionButton({label, desc, handler}){
   return (
@@ -53,23 +40,15 @@ ActionButton.propTypes = {
   handler: PropTypes.func.isRequired
 }
 
-function ConnectionsCard(){
-  return (
-    <Card>
-      <CardBody>
-        <Stack>
-          <Heading size="md">Server Connections</Heading>
-          { servers.map(label => (
-            <ServerStatus key={`${label}-status`} label={label} />
-          ))}
-        </Stack>
-      </CardBody>
-    </Card>
-  )
-}
-
 function ActionsCard({title, actions, wsUrl}){
-  const { sendMessage, lastMessage } = useWebSocket(wsUrl);
+  const didUnmount = React.useRef(false)
+  const { sendMessage, lastMessage, readyState } = useWebSocket(wsUrl,{
+    shouldReconnect: () => didUnmount.current === false,
+    reconnectAttempts: 10,
+    reconnectInterval: 1000
+  });
+
+  React.useEffect(() => () => didUnmount.current === true)
 
   React.useEffect(() => {
     console.log(lastMessage)
@@ -79,7 +58,10 @@ function ActionsCard({title, actions, wsUrl}){
     <Card>
       <CardBody>
         <Stack>
-          <Heading size="md">{title}</Heading>
+          <HStack>
+            <ConnectionStatus readyState={readyState} />
+            <Heading size="md">{title}</Heading>
+          </HStack>
           <HStack>
             <Heading size="s">Last Action:</Heading>
             <Text>None</Text>
@@ -110,7 +92,6 @@ export default function Control(){
   return (
     <Flex h="100vh" w="100vw" align="center" justify="center">
       <Stack w="20vw">
-        <ConnectionsCard />
         <ActionsCard title="ALIS" actions={mxActions} wsUrl={mxUrl}/>
         <ActionsCard title="TBMCS" actions={msnActions} wsUrl={msnUrl}/>
       </Stack>
