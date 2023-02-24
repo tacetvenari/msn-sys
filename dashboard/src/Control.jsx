@@ -7,12 +7,14 @@ import {
   Flex,
   Heading,
   HStack,
+  ListItem,
   Stack,
-  Text,
-  Tooltip
+  Tooltip,
+  UnorderedList
 } from '@chakra-ui/react'
 import msnActions from './msnActions'
 import mxActions from './mxActions'
+import useActionLog from './useActionLog'
 import usePersistentSocket from './usePersistentSocket'
 
 import ConnectionStatus from './ConnectionStatus'
@@ -40,25 +42,35 @@ ActionButton.propTypes = {
   handler: PropTypes.func.isRequired
 }
 
-function ActionsCard({title, actions, wsUrl}){
+function ActionsCard({title, actions, wsUrl, logKey}){
+  const [actionLog, logItem, clearLog] = useActionLog(logKey)
   const { sendMessage, lastMessage, connectionStatus } = usePersistentSocket(wsUrl);
 
   React.useEffect(() => {
-    if(lastMessage) console.log(lastMessage)
-  }, [lastMessage])
+    if (lastMessage && lastMessage.type === 'message'){
+      logItem(lastMessage)
+    }
+  }, [logItem, lastMessage])
 
   return (
-    <Card>
+    <Card h="36em">
       <CardBody>
         <Stack>
           <HStack>
             <ConnectionStatus state={connectionStatus} />
             <Heading size="md">{title}</Heading>
           </HStack>
-          <HStack>
-            <Heading size="s">Last Action:</Heading>
-            <Text>None</Text>
-          </HStack>
+          <Stack>
+            <Stack bg="gray.800" p={4} borderRadius={4} h="20em" w="22em">
+              <Button onClick={clearLog}>Clear Log</Button>
+              <UnorderedList styleType="none">
+                { actionLog.map(item => {
+                  const [msgId, timestamp, msg] = item.split('::')
+                  return (<ListItem key={msgId}>{`${timestamp} - ${msg}`}</ListItem> )
+                })}
+              </UnorderedList>
+            </Stack>
+          </Stack>
           { actions.map(({label, desc, handler}) => (
             <ActionButton key={label} label={label} desc={desc} handler={() => handler(sendMessage)} />
           ))}
@@ -75,7 +87,8 @@ ActionsCard.propTypes = {
     desc: PropTypes.string.isRequired,
     handler: PropTypes.func.isRequired
   })).isRequired,
-  wsUrl: PropTypes.string.isRequired
+  wsUrl: PropTypes.string.isRequired,
+  logKey: PropTypes.string.isRequired
 }
 
 export default function Control(){
@@ -84,10 +97,10 @@ export default function Control(){
 
   return (
     <Flex h="100vh" w="100vw" align="center" justify="center">
-      <Stack w="20vw">
-        <ActionsCard title="ALIS" actions={mxActions} wsUrl={mxUrl}/>
-        <ActionsCard title="TBMCS" actions={msnActions} wsUrl={msnUrl}/>
-      </Stack>
+      <HStack align="flex-start">
+        <ActionsCard title="ALIS" actions={mxActions} wsUrl={mxUrl} logKey="mx-action-log"/>
+        <ActionsCard title="TBMCS" actions={msnActions} wsUrl={msnUrl} logKey="msn-action-log" />
+      </HStack>
     </Flex>
   )
 }
