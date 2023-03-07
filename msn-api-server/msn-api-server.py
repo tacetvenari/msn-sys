@@ -3,17 +3,18 @@ from urllib.request import urlopen
 import asyncio
 import json
 import socket
+import os
 import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
-DATA_SERVERS = [
-    "http://localhost:8012",
-    "http://localhost:8013",
-    "http://localhost:8014",
-    "http://localhost:8015",
-    "http://localhost:8016",
-    "http://localhost:8017"
-]
+DATA_SERVERS=os.environ["VITE_DATA_SERVERS"].split(" ")
+#DATA_SERVERS = ["http://msn-data-1:8012",
+#    "http://msn-data-2:8012",
+#    "http://msn-data-3:8012",
+#    "http://msn-data-4:8012",
+#    "http://msn-data-5:8012",
+#    "http://msn-data-6:8012"
+#]
 
 # Connection channels
 connections = {

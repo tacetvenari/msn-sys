@@ -7,12 +7,13 @@ import socket
 import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
-DATA_SERVERS = [
-    "http://localhost:8008",
-    "http://localhost:8009",
-    "http://localhost:8010",
-    "http://localhost:8011"
-]
+DATA_SERVERS=os.environ["VITE_DATA_SERVERS"].split(" ")
+#DATA_SERVERS = [
+#    "http://mx-data-1:8008",
+#    "http://mx-data-2:8008",
+#    "http://mx-data-3:8008",
+#    "http://mx-data-4:8008"
+#]
 
 # Connection channels
 connections = {
