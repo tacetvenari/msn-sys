@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "VITE_LOCAL_IP=$(ifconfig en0 | awk '/inet / {print $2}') vite --host",
+    "dev": "VITE_LOCAL_IP=$(python3 -c 'import socket; ip=socket.gethostbyname(socket.gethostname()); print(ip)') vite --host",
     "build": "vite build",
     "preview": "vite preview"
   },

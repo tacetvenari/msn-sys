@@ -1,4 +1,5 @@
-LOCAL_IP=$$(ifconfig en0 | awk '/inet / {print $$2}')
+#LOCAL_IP=$$(ifconfig en0 | awk '/inet / {print $$2}')
+LOCAL_IP=$$(python3 -c 'import socket; ip=socket.gethostbyname(socket.gethostname()); print(ip)')
 WS_PORT=8889
 
 start:
