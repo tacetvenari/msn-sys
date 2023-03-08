@@ -17,6 +17,10 @@ class Server(BaseHTTPRequestHandler):
             "/return": "return-mx-data.json"
         }
 
+        # Ignore browser favicon request
+        if self.path == "/favicon.ico":
+            return False
+
         with open(files[self.path]) as file:
             data = json.load(file)
             data['tailnumber'] = TAILNUMBER
