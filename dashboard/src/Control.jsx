@@ -92,8 +92,8 @@ ActionsCard.propTypes = {
 }
 
 export default function Control(){
-  const mxUrl = `ws://${VITE_WS_MX_URI}:${VITE_WS_MX_PORT}${VITE_WS_MX_CONTROL_PATH}`;
-  const msnUrl = `ws://${VITE_WS_MSN_URI}:${VITE_WS_MSN_PORT}${VITE_WS_MSN_CONTROL_PATH}`;
+  const mxUrl = `ws://${VITE_WS_MX_URI}:${VITE_WS_MX_PORT}/${VITE_WS_MX_CONTROL_PATH}`;
+  const msnUrl = `ws://${VITE_WS_MSN_URI}:${VITE_WS_MSN_PORT}/${VITE_WS_MSN_CONTROL_PATH}`;
 
   return (
     <Flex h="100vh" w="100vw" align="center" justify="center">
