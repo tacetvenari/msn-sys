@@ -15,11 +15,14 @@ services:
 
       - VITE_WS_MSN_URI=msn-api
       - VITE_WS_MSN_PORT=8889
+      - VITE_WS_MSN_PATH=msn-dashboard
       - VITE_WS_MSN_CONTROL_PATH=msn-controller
 
       - VITE_WS_MX_URI=mx-api
       - VITE_WS_MX_PORT=8888
+      - VITE_WS_MX_PATH=mx-dashboard
       - VITE_WS_MX_CONTROL_PATH=mx-controller
+
 
   msn-api:
     image: tv-msn-api-server

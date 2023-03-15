@@ -3,12 +3,12 @@ import useWebSocket from 'react-use-websocket'
 import AircraftList from './AircraftList'
 import Layout from './Layout'
 
-const {VITE_LOCAL_IP, VITE_WS_MX_PORT, VITE_WS_MX_PATH} = import.meta.env
+const {VITE_WS_MX_URI, VITE_WS_MX_PORT, VITE_WS_MX_PATH} = import.meta.env
 const TAIL_NUMBERS = ["tv-01", "tv-02", "tv-05", "tv-06"]
 
 export default function MxDashboard(){
   const [mxState, setMxState] = React.useState([])
-  const { lastMessage } = useWebSocket(`ws://${VITE_LOCAL_IP}:${VITE_WS_MX_PORT}${VITE_WS_MX_PATH}`);
+  const { lastMessage } = useWebSocket(`ws://${VITE_WS_MX_URI}:${VITE_WS_MX_PORT}/${VITE_WS_MX_PATH}`);
 
   React.useEffect(() => {
     if(lastMessage){
