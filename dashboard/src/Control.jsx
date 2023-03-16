@@ -59,7 +59,7 @@ function ActionsCard({title, actions, wsUrl, logKey}){
   }, [logItem, lastMessage])
 
   return (
-    <Card h="36em">
+    <Card h="40rem" w="36rem">
       <CardBody>
         <Stack>
           <HStack>
@@ -67,7 +67,7 @@ function ActionsCard({title, actions, wsUrl, logKey}){
             <Heading size="md">{title}</Heading>
           </HStack>
           <Stack>
-            <Stack bg="gray.800" p={4} borderRadius={4} h="20em" w="22em">
+            <Stack bg="gray.800" p={4} borderRadius={4} h="20em">
               <Button onClick={clearLog}>Clear Log</Button>
               <UnorderedList styleType="none">
                 { actionLog.map(item => {
