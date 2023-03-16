@@ -28,23 +28,29 @@ const {
   VITE_WS_MSN_CONTROL_PATH,
 } = import.meta.env
 
-function ActionButton({label, desc, handler}){
+function ActionButton({label, desc, handler, connectionCode}){
+  const isDisabled = connectionCode !== 1
   return (
     <Tooltip label={desc} placement="right" openDelay={1000} aria-label={`${label}-tooltip`}>
-      <Button onClick={handler}>{label}</Button>
+      <Button onClick={handler} disabled={isDisabled}>{label}</Button>
     </Tooltip>
   )
+}
+
+ActionButton.defaultProps = {
+  connectionCode: 0
 }
 
 ActionButton.propTypes = {
   label: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
-  handler: PropTypes.func.isRequired
+  handler: PropTypes.func.isRequired,
+  connectionCode: PropTypes.number
 }
 
 function ActionsCard({title, actions, wsUrl, logKey}){
   const [actionLog, logItem, clearLog] = useActionLog(logKey)
-  const { sendMessage, lastMessage, connectionStatus } = usePersistentSocket(wsUrl);
+  const { sendMessage, lastMessage, connectionStatus, statusCode } = usePersistentSocket(wsUrl);
 
   React.useEffect(() => {
     if (lastMessage && lastMessage.type === 'message'){
@@ -72,7 +78,7 @@ function ActionsCard({title, actions, wsUrl, logKey}){
             </Stack>
           </Stack>
           { actions.map(({label, desc, handler}) => (
-            <ActionButton key={label} label={label} desc={desc} handler={() => handler(sendMessage)} />
+            <ActionButton key={label} label={label} desc={desc} handler={() => handler(sendMessage)} connectionCode={statusCode}  />
           ))}
         </Stack>
       </CardBody>

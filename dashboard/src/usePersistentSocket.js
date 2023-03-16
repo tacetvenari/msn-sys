@@ -24,6 +24,7 @@ export default function usePersistentSocket(url, opts){
     sendMessage,
     lastMessage,
     readyState,
-    connectionStatus
+    connectionStatus,
+    statusCode: readyState
   }
 }
