@@ -15,6 +15,10 @@ function handleResetMission(send){
   send('reset')
 }
 
+function handleRestoreMission(send){
+  send('restore')
+}
+
 export default [
   { 
     label: "Build MX Data",
@@ -35,5 +39,10 @@ export default [
     label: "Reset MX Data",
     desc: "MX API Server will clear the msn data file", 
     handler: handleResetMission
+  },
+  { 
+    label: "Restore MX Data",
+    desc: "MX Data Server will overwrite msn data with backup data", 
+    handler: handleRestoreMission
   }
 ]

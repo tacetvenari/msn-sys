@@ -1,23 +1,30 @@
 
 function handleBuildATO(send){
-  // Send post fetch to mission server
   send('build')
 }
 
 function handlePublishATO(send){
-  // Fetch mission server from dashboard
   send('publish')
+}
+
+function handleRestoreMsnData(send){
+  send('restore')
 }
 
 export default [
   { 
     label: "Build ATO",
-    desc: "",
+    desc: "MSN API Server will build the ATO",
     handler: handleBuildATO
   },
   { 
     label: "Publish ATO",
-    desc: "",
+    desc: "MSN API Server will publish the ATO to the MSN Dashboard",
     handler: handlePublishATO
+  },
+  { 
+    label: "Restore ATO Data",
+    desc: "MSN Data Servers will overwrite MSN Data with backup data",
+    handler: handleRestoreMsnData
   },
 ]

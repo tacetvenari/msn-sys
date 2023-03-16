@@ -39,8 +39,12 @@ def build_msn_data(path='/'):
 
         msn_data_file.write(json.dumps(data))
         msn_data_file.close()
-    websockets.broadcast(connections['/msn-controller'], "{'build': true}")
+    websockets.broadcast(connections['/msn-controller'], "Built mission data on MSN API Server")
 
+def restore_msn_data():
+    for idx, data_server in enumerate(DATA_SERVERS):
+        urlopen(f"{data_server}/restore")
+    websockets.broadcast(connections['/msn-controller'], "Restored MSN Data on MSN Data Servers")
 
 async def socket_handler(websocket, path):
     # Register connection
@@ -54,17 +58,19 @@ async def socket_handler(websocket, path):
                 with open(MSN_DATA_FILE) as file:
                     data = json.load(file)
                     websockets.broadcast(connections['/msn-dashboard'], json.dumps(data))
-                    websockets.broadcast(connections['/msn-controller'], "{'publish': true}")
+                    websockets.broadcast(connections['/msn-controller'], "Published mission data to MSN Dashboard")
                     file.close()
             elif message == "build":
                 build_msn_data()
             elif message == "return":
                 build_msn_data('/return')
+            elif message == "restore":
+                restore_msn_data()
             elif message == "reset":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
-                websockets.broadcast(connections['/msn-controller'], "{'reset': true}")
+                websockets.broadcast(connections['/msn-controller'], "Reset mission data on MSN API Server")
 
     finally:
         # Unregister connection
