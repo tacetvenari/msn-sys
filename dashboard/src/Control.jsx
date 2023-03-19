@@ -8,10 +8,13 @@ import {
   Heading,
   HStack,
   ListItem,
+  Select,
   Stack,
+  Text,
   Tooltip,
   UnorderedList
 } from '@chakra-ui/react'
+import { InfoIcon } from "@chakra-ui/icons"
 import msnActions from './msnActions'
 import mxActions from './mxActions'
 import useActionLog from './useActionLog'
@@ -48,6 +51,39 @@ ActionButton.propTypes = {
   connectionCode: PropTypes.number
 }
 
+function ActionSelect({label, desc, handler, options}){
+  const handleChangeValue = (event) => {
+    handler()(event.target.value)
+  }
+
+  return(
+    <HStack spacing={4}>
+      <Text fontWeight="bold" flexGrow={1} noOfLines={1}>{label}</Text>
+      <Tooltip label={desc} placement="top-start" openDelay={1000} aria-label={`${label}-tooltip`}>
+        <InfoIcon />
+      </Tooltip>
+      <Select flexBasis="60%" onChange={handleChangeValue}>
+        { options.map(opt => (
+          <option key={`option-${opt.value}`} value={opt.value}>{opt.label}</option>
+        ))}
+      </Select>
+    </HStack>
+  )
+}
+
+ActionSelect.defaultProps = {
+  options: []
+}
+
+ActionSelect.propTypes = {
+  label: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  handler: PropTypes.func.isRequired,
+  options: PropTypes.arrayOf(PropTypes.shape({
+    label: PropTypes.string
+  }))
+}
+
 function ActionsCard({title, actions, wsUrl, logKey}){
   const [actionLog, logItem, clearLog] = useActionLog(logKey)
   const { sendMessage, lastMessage, connectionStatus, statusCode } = usePersistentSocket(wsUrl);
@@ -59,7 +95,7 @@ function ActionsCard({title, actions, wsUrl, logKey}){
   }, [logItem, lastMessage])
 
   return (
-    <Card h="40rem" w="36rem">
+    <Card w="36rem">
       <CardBody>
         <Stack>
           <HStack>
@@ -77,9 +113,18 @@ function ActionsCard({title, actions, wsUrl, logKey}){
               </UnorderedList>
             </Stack>
           </Stack>
-          { actions.map(({label, desc, handler}) => (
-            <ActionButton key={label} label={label} desc={desc} handler={() => handler(sendMessage)} connectionCode={statusCode}  />
-          ))}
+          { actions.map(({type, label, desc, handler, options}) => {
+            let component
+            if(type === "button"){
+              component = (
+                <ActionButton key={label} label={label} desc={desc} handler={() => handler(sendMessage)} connectionCode={statusCode}  />
+              )
+            }
+            else if(type === "select"){
+              component = (<ActionSelect key={label} label={label} desc={desc} options={options} handler={() => handler(sendMessage)} />)
+            }
+            return component
+          })}
         </Stack>
       </CardBody>
     </Card>
@@ -103,7 +148,7 @@ export default function Control(){
 
   return (
     <Flex h="100vh" w="100vw" align="center" justify="center">
-      <HStack align="flex-start">
+      <HStack align="stretch">
         <ActionsCard title="ALIS" actions={mxActions} wsUrl={mxUrl} logKey="mx-action-log"/>
         <ActionsCard title="TBMCS" actions={msnActions} wsUrl={msnUrl} logKey="msn-action-log" />
       </HStack>

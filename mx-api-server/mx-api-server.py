@@ -17,7 +17,8 @@ DATA_SERVERS = [
 # Connection channels
 connections = {
     '/mx-controller': set(),
-    '/mx-dashboard': set()
+    '/mx-dashboard': set(),
+    '/mx-sortie-state': set()
 }
 
 # Build MX data from data servers; Path determines source file to build from
@@ -66,6 +67,15 @@ async def socket_handler(websocket, path):
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
                 websockets.broadcast(connections['/mx-controller'], "Reset MX Data on MX API Server")
+            elif message == "sortie-land":
+                websockets.broadcast(connections['/mx-sortie-state'], "land")
+                websockets.broadcast(connections['/mx-controller'], "Sortie state: LANDED")
+            elif message == "sortie-takeoff":
+                websockets.broadcast(connections['/mx-sortie-state'], "takeoff")
+                websockets.broadcast(connections['/mx-controller'], "Sortie state: TAKEOFF")
+            elif message == "sortie-canx":
+                websockets.broadcast(connections['/mx-sortie-state'], "canx")
+                websockets.broadcast(connections['/mx-controller'], "Sortie state: CANXD")
 
     finally:
         # Unregister connection
