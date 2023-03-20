@@ -9,7 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 
-const {VITE_MSN_NUMBER, VITE_SHOPS} = import.meta.env
+const {VITE_SHOPS} = import.meta.env
 const SHOPS = VITE_SHOPS.split(' ')
 
 function MetaSection({label, value}){
@@ -119,16 +119,25 @@ MissionStatus.propTypes = {
 
 export default function AirTaskingOrderCard({msnData}){
   const {intel} = msnData
+  const {msn_id: msnId} = intel
 
   return (
     <Card px={4} py={2}>
       <Stack spacing={6}>
-        <Heading size="lg">{`Mission ${VITE_MSN_NUMBER}`}</Heading>
+        <Heading size="lg">{`Mission ${msnId}`}</Heading>
         <MissionStatus states={msnData} />
         <MissionMeta intel={intel}/>
       </Stack>
     </Card>
   )
+}
+
+AirTaskingOrderCard.defaultProps = {
+  msnData: {
+    intel: {
+      msn_id: 'unk'
+    }
+  }
 }
 
 AirTaskingOrderCard.propTypes = {
@@ -139,6 +148,6 @@ AirTaskingOrderCard.propTypes = {
       msn_return: PropTypes.string,
       msn_platform: PropTypes.string,
       msn_target: PropTypes.string,
-    }).isRequired
-  }).isRequired
+    })
+  })
 }
