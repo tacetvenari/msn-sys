@@ -118,7 +118,6 @@ MissionStatus.propTypes = {
 }
 
 export default function AirTaskingOrderCard({msnData}){
-  console.log('msndata', msnData)
   const {intel} = msnData
 
   return (
