@@ -42,7 +42,7 @@ function MissionMeta({intel}){
     <Stack>
       <Heading size="md">Mission Data</Heading>
       <Divider />
-      <HStack justifyContent="center" spacing={16}>
+      <HStack justifyContent="center" spacing={8}>
         <MetaSection label="Takeoff" value={msnTakeoff} />
         <MetaSection label="Return" value={msnReturn} />
         <MetaSection label="Platform" value={msnPlatform} />
@@ -96,7 +96,7 @@ function MissionStatus({states}){
     <Stack>
       <Heading size="md">Mission Status</Heading>
       <Divider />
-      <HStack justifyContent="center" spacing={6}>
+      <HStack justifyContent="center" spacing={4}>
         {SHOPS.map((shop, idx) => {
           const currentState = states[shop] && states[shop].status ? states[shop].status : 'unk'
           const delay = idx * 0.5
