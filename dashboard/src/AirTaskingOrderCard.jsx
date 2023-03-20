@@ -119,12 +119,12 @@ MissionStatus.propTypes = {
 
 export default function AirTaskingOrderCard({msnData}){
   const {intel} = msnData
-  const {msn_id: msnId} = intel
+  const {msn_id: msnId = "unk"} = intel
 
   return (
     <Card px={4} py={2}>
       <Stack spacing={6}>
-        <Heading size="lg">{`Mission ${msnId}`}</Heading>
+        <Heading size="lg">{`Mission ${msnId.toUpperCase()}`}</Heading>
         <MissionStatus states={msnData} />
         <MissionMeta intel={intel}/>
       </Stack>

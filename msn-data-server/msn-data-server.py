@@ -33,15 +33,11 @@ class Server(BaseHTTPRequestHandler):
                 data = {}
                 shopData = json.load(file)
 
-                # If not intel, delete msn meta data
-                if SHOP != "intel":
-                    del shopData['msn_id']
-                    del shopData['msn_takeoff']
-                    del shopData['msn_return']
-                    del shopData['msn_platform']
-                    del shopData['msn_target']
-
-                data[SHOP] = shopData
+                # If not intel, strip msn meta data
+                if SHOP == "intel":
+                    data[SHOP] = shopData
+                else:
+                    data[SHOP] = {key:shopData[key] for key in shopData if key == 'status'}
 
                 self._set_headers()
                 self.wfile.write(json.dumps(data).encode('utf-8'))
