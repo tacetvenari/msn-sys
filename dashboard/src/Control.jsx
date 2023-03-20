@@ -7,6 +7,7 @@ import {
   Flex,
   Heading,
   HStack,
+  Input,
   ListItem,
   Select,
   Stack,
@@ -51,7 +52,31 @@ ActionButton.propTypes = {
   connectionCode: PropTypes.number
 }
 
-function ActionSelect({label, desc, handler, options}){
+function ActionInput({label, desc, connectionCode}){
+  const isDisabled = connectionCode !== 1
+  return (
+    <HStack>
+      <Text fontWeight="bold" flexGrow={1} noOfLines={1}>{label}</Text>
+      <Tooltip label={desc} placement="top-start" openDelay={1000} aria-label={`${label}-tooltip`}>
+        <InfoIcon />
+      </Tooltip>
+      <Input flexBasis="60%" placeholder={label} disabled={isDisabled} />
+    </HStack>
+  )
+}
+
+ActionInput.defaultProps = {
+  connectionCode: 0
+}
+
+ActionInput.propTypes = {
+  label: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  connectionCode: PropTypes.number
+}
+
+function ActionSelect({label, desc, handler, options, connectionCode}){
+  const isDisabled = connectionCode !== 1
   const handleChangeValue = (event) => {
     handler()(event.target.value)
   }
@@ -62,7 +87,7 @@ function ActionSelect({label, desc, handler, options}){
       <Tooltip label={desc} placement="top-start" openDelay={1000} aria-label={`${label}-tooltip`}>
         <InfoIcon />
       </Tooltip>
-      <Select flexBasis="60%" onChange={handleChangeValue}>
+      <Select flexBasis="60%" onChange={handleChangeValue} disabled={isDisabled}>
         { options.map(opt => (
           <option key={`option-${opt.value}`} value={opt.value}>{opt.label}</option>
         ))}
@@ -72,7 +97,8 @@ function ActionSelect({label, desc, handler, options}){
 }
 
 ActionSelect.defaultProps = {
-  options: []
+  options: [],
+  connectionCode: 0
 }
 
 ActionSelect.propTypes = {
@@ -81,7 +107,8 @@ ActionSelect.propTypes = {
   handler: PropTypes.func.isRequired,
   options: PropTypes.arrayOf(PropTypes.shape({
     label: PropTypes.string
-  }))
+  })),
+  connectionCode: PropTypes.number
 }
 
 function ActionsCard({title, actions, wsUrl, logKey}){
@@ -120,8 +147,11 @@ function ActionsCard({title, actions, wsUrl, logKey}){
                 <ActionButton key={label} label={label} desc={desc} handler={() => handler(sendMessage)} connectionCode={statusCode}  />
               )
             }
+            else if(type === "input"){
+              component = (<ActionInput key={label} label={label} desc={desc} connectionCode={statusCode} />)
+            }
             else if(type === "select"){
-              component = (<ActionSelect key={label} label={label} desc={desc} options={options} handler={() => handler(sendMessage)} />)
+              component = (<ActionSelect key={label} label={label} desc={desc} options={options} handler={() => handler(sendMessage)} connectionCode={statusCode} />)
             }
             return component
           })}
@@ -134,9 +164,9 @@ function ActionsCard({title, actions, wsUrl, logKey}){
 ActionsCard.propTypes = {
   title: PropTypes.string.isRequired,
   actions: PropTypes.arrayOf(PropTypes.shape({
-    label: PropTypes.string.isRequired,
-    desc: PropTypes.string.isRequired,
-    handler: PropTypes.func.isRequired
+    label: PropTypes.string,
+    desc: PropTypes.string,
+    handler: PropTypes.func
   })).isRequired,
   wsUrl: PropTypes.string.isRequired,
   logKey: PropTypes.string.isRequired
