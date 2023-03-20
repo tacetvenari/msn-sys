@@ -29,12 +29,6 @@ def build_msn_data(path='/'):
             json_data = json.loads(content)
 
             key = list(json_data.keys())[0] # Grab the first key (shop name)
-
-            # Pull target from intel
-            if key == 'intel':
-                data['target'] = json_data[key]['target']
-
-            json_data[key].pop('target') # Remove target before writing to data
             data[key] = json_data[key]
 
         msn_data_file.write(json.dumps(data))

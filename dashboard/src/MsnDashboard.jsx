@@ -11,7 +11,7 @@ import Map from './Map'
 const {VITE_LOCAL_IP, VITE_WS_MSN_PORT, VITE_WS_MSN_PATH} = import.meta.env
 
 export default function MsnDashboard(){
-  const [msnState, setMsnState] = React.useState({})
+  const [msnState, setMsnState] = React.useState({ intel: {}})
   const { lastMessage } = useWebSocket(`ws://${VITE_LOCAL_IP}:${VITE_WS_MSN_PORT}${VITE_WS_MSN_PATH}`);
 
   React.useEffect(() => {

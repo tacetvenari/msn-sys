@@ -22,7 +22,7 @@ class Server(BaseHTTPRequestHandler):
             return False
         elif self.path == "/restore": # Restore backup data
             print("Restoring data...")
-            message = { "message" : "Restore complete"}
+            message = { "message" : "MSN Data Servers mission data restored"}
 
             shutil.copy(files['/restore'], files['/']) # Overwrite data with backup
 
@@ -31,7 +31,17 @@ class Server(BaseHTTPRequestHandler):
         else:
             with open(files[self.path]) as file:
                 data = {}
-                data[SHOP] = json.load(file)
+                shopData = json.load(file)
+
+                # If not intel, delete msn meta data
+                if SHOP != "intel":
+                    del shopData['msn_id']
+                    del shopData['msn_takeoff']
+                    del shopData['msn_return']
+                    del shopData['msn_platform']
+                    del shopData['msn_target']
+
+                data[SHOP] = shopData
 
                 self._set_headers()
                 self.wfile.write(json.dumps(data).encode('utf-8'))
