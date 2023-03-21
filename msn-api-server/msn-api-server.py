@@ -62,7 +62,7 @@ async def socket_handler(websocket, path):
                 restore_msn_data()
             elif message == "reset":
                 with open(MSN_DATA_FILE, 'w') as msn_data_file:
-                    msn_data_file.write(f"[]")
+                    msn_data_file.write("{}")
                     msn_data_file.close()
                 websockets.broadcast(connections['/msn-controller'], "Reset mission data on MSN API Server")
             elif message.startswith("updateIntel"):

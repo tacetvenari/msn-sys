@@ -44,13 +44,13 @@ export default [
   },
   { 
     type: "button",
-    label: "Build Return Data",
+    label: "Build Return MX Data",
     desc: "MX API Server will pull the return data from the MX Data Servers",
     handler: handleReturnSortie
   },
   { 
     type: "button",
-    label: "Publish Data",
+    label: "Publish MX Data",
     desc: "MX API Server will push the built data to the MX Dashboard",
     handler: handlePublishMission
   },

@@ -118,7 +118,9 @@ MissionStatus.propTypes = {
 }
 
 export default function AirTaskingOrderCard({msnData}){
-  const {intel} = msnData
+  // The defaultProps get overwritten when an empty object is passed in
+  // There must be a better pattern for this
+  const {intel = {}} = msnData
   const {msn_id: msnId = "unk"} = intel
 
   return (

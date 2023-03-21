@@ -6,6 +6,10 @@ function handlePublishATO(send){
   send('publish')
 }
 
+function handleResetATO(send){
+  send('reset')
+}
+
 function handleWriteMsnData(send){
   function getLocalStorageItem(key){
     return JSON.parse(window.localStorage.getItem(key))
@@ -67,13 +71,19 @@ export default [
   { 
     type: "button",
     label: "Build ATO",
-    desc: "",
+    desc: "MSN API Server will compile ATO",
     handler: handleBuildATO
   },
   { 
     type: "button",
     label: "Publish ATO",
-    desc: "",
+    desc: "MSN API Server will send ATO to Msn Dashboard",
     handler: handlePublishATO
+  },
+  { 
+    type: "button",
+    label: "Reset ATO",
+    desc: "MSN API Server will clear ATO data",
+    handler: handleResetATO
   },
 ]
