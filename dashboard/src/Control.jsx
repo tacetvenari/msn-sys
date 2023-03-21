@@ -19,6 +19,7 @@ import { InfoIcon } from "@chakra-ui/icons"
 import msnActions from './msnActions'
 import mxActions from './mxActions'
 import useActionLog from './useActionLog'
+import useLocalStorage from './useLocalStorage'
 import usePersistentSocket from './usePersistentSocket'
 
 import ConnectionStatus from './ConnectionStatus'
@@ -34,6 +35,7 @@ const {
 
 function ActionButton({label, desc, handler, connectionCode}){
   const isDisabled = connectionCode !== 1
+
   return (
     <Tooltip label={desc} placement="right" openDelay={1000} aria-label={`${label}-tooltip`}>
       <Button onClick={handler} disabled={isDisabled}>{label}</Button>
@@ -52,15 +54,22 @@ ActionButton.propTypes = {
   connectionCode: PropTypes.number
 }
 
-function ActionInput({label, desc, connectionCode}){
+function ActionInput({label, desc, localStorageKey, defaultValue, connectionCode}){
+  const [localVal, setLocalVal] = useLocalStorage(localStorageKey, defaultValue)
   const isDisabled = connectionCode !== 1
+
+  // Hacky way to force the default value to be written to localStorage before the user edits the default value
+  // This is needed since the unmodified value is not initially written - there is an action that relies on this being in localstorage
+  if(!window.localStorage.getItem(localStorageKey)) setLocalVal(defaultValue)
+
+  const handleChange = (e) => setLocalVal(e.target.value)
   return (
     <HStack>
       <Text fontWeight="bold" flexGrow={1} noOfLines={1}>{label}</Text>
       <Tooltip label={desc} placement="top-start" openDelay={1000} aria-label={`${label}-tooltip`}>
         <InfoIcon />
       </Tooltip>
-      <Input flexBasis="60%" placeholder={label} disabled={isDisabled} />
+      <Input value={localVal} onChange={handleChange} flexBasis="60%" placeholder={label} disabled={isDisabled} />
     </HStack>
   )
 }
@@ -72,6 +81,8 @@ ActionInput.defaultProps = {
 ActionInput.propTypes = {
   label: PropTypes.string.isRequired,
   desc: PropTypes.string.isRequired,
+  localStorageKey: PropTypes.string.isRequired,
+  defaultValue: PropTypes.string.isRequired,
   connectionCode: PropTypes.number
 }
 
@@ -140,7 +151,7 @@ function ActionsCard({title, actions, wsUrl, logKey}){
               </UnorderedList>
             </Stack>
           </Stack>
-          { actions.map(({type, label, desc, handler, options}) => {
+          { actions.map(({type, label, desc, handler, localStorageKey, defaultValue, options}) => {
             let component
             if(type === "button"){
               component = (
@@ -148,7 +159,7 @@ function ActionsCard({title, actions, wsUrl, logKey}){
               )
             }
             else if(type === "input"){
-              component = (<ActionInput key={label} label={label} desc={desc} connectionCode={statusCode} />)
+              component = (<ActionInput key={label} label={label} desc={desc} localStorageKey={localStorageKey} defaultValue={defaultValue} connectionCode={statusCode} />)
             }
             else if(type === "select"){
               component = (<ActionSelect key={label} label={label} desc={desc} options={options} handler={() => handler(sendMessage)} connectionCode={statusCode} />)

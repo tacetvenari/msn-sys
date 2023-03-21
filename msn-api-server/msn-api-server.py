@@ -1,5 +1,5 @@
 from sys import argv
-from urllib.request import urlopen
+from urllib import request, parse
 import asyncio
 import json
 import socket
@@ -10,7 +10,7 @@ DATA_SERVERS = [
     "http://localhost:8012",
     "http://localhost:8013",
     "http://localhost:8014",
-    "http://localhost:8015",
+    "http://localhost:8015", #Intel
     "http://localhost:8016",
     "http://localhost:8017"
 ]
@@ -25,7 +25,7 @@ def build_msn_data(path='/'):
     with open(MSN_DATA_FILE, 'w') as msn_data_file:
         data = {}
         for idx, data_server in enumerate(DATA_SERVERS):
-            content = urlopen(f"{data_server}{path}").read().decode()
+            content = request.urlopen(f"{data_server}{path}").read().decode()
             json_data = json.loads(content)
 
             key = list(json_data.keys())[0] # Grab the first key (shop name)
@@ -37,7 +37,7 @@ def build_msn_data(path='/'):
 
 def restore_msn_data():
     for idx, data_server in enumerate(DATA_SERVERS):
-        urlopen(f"{data_server}/restore")
+        request.urlopen(f"{data_server}/restore")
     websockets.broadcast(connections['/msn-controller'], "Restored MSN Data on MSN Data Servers")
 
 async def socket_handler(websocket, path):
@@ -65,6 +65,15 @@ async def socket_handler(websocket, path):
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
                 websockets.broadcast(connections['/msn-controller'], "Reset mission data on MSN API Server")
+            elif message.startswith("updateIntel"):
+                data = { 'msn_data': message.split(' ')[1] }
+
+                post_url = DATA_SERVERS[3] + '/updateMsn'
+                post_data = parse.urlencode(data).encode()
+                req = request.Request(post_url, data=post_data)
+                resp = request.urlopen(req)
+
+                websockets.broadcast(connections['/msn-controller'], "Updated Intel mission data")
 
     finally:
         # Unregister connection

@@ -1,4 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib import parse
+import base64
 import json
 import shutil
 
@@ -7,6 +9,13 @@ class Server(BaseHTTPRequestHandler):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
+
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Credentials', 'true')
+        self.send_header('Access-Control-Allow-Origin', 'http://192.168.0.89:5173')
+        self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With, Content-type")
 
     def do_HEAD(self):
         self._set_headers()
@@ -45,14 +54,38 @@ class Server(BaseHTTPRequestHandler):
                 file.close()
 
     def do_POST(self):
-        with open('log', 'a') as log:
-            content = self.rfile.read(int(self.headers.get('Content-Length')))
-            log.write(f'{content.decode()}\n')
+        if self.path == "/":
+            with open("log", "a") as log:
+                content = self.rfile.read(int(self.headers.get("Content-Length")))
+                log.write(f'{content.decode()}\n')
+
+                self._set_headers()
+                self.wfile.write(content)
+
+                log.close()
+        elif self.path == "/updateMsn":
+            base64_content = parse.unquote_plus(self.rfile.read(int(self.headers.get("Content-Length"))).decode("utf-8").split("data=")[1])
+            new_content = json.loads(base64.b64decode(base64_content))
+            content = {}
+
+            # Read file
+            with open("msn-data.json", "r") as msnfile:
+                content = json.load(msnfile)
+                msnfile.close()
+
+            # Update content
+            for key in new_content:
+                content[key] = new_content[key]
+
+            # Write file
+            with open("msn-data.json", "w") as msnfile:
+                json.dump(content, msnfile)
+                msnfile.close()
+
+            message = { "message" : "Intel mission data updated"}
 
             self._set_headers()
-            self.wfile.write(content)
-
-            log.close()
+            self.wfile.write(json.dumps(message).encode('utf-8'))
 
 def run(server_class=HTTPServer, handler_class=Server, port='8008', shop='unk'):
     server_address = ('', port)
