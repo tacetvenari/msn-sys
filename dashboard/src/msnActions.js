@@ -19,8 +19,6 @@ function handleWriteMsnData(send){
   const postData = {msn_id: msnId, msn_takeoff: msnTakeoff, msn_return: msnReturn, msn_platform: msnPlatform, msn_target: msnTarget}
   const encodedData = btoa(JSON.stringify(postData))
 
-  console.log(postData)
-
   send(`updateIntel ${encodedData}`)
 }
 
