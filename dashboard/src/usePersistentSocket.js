@@ -5,8 +5,8 @@ export default function usePersistentSocket(url, opts){
   const didUnmount = useRef(false)
   const { sendMessage, lastMessage, readyState } = useWebSocket(url,{
     shouldReconnect: () => didUnmount.current === false,
-    reconnectAttempts: 10,
-    reconnectInterval: 1000,
+    reconnectAttempts: 1440, // At 5 second interval, this will try for 2 hours
+    reconnectInterval: 5000,
     ...opts
   });
 
