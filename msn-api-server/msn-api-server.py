@@ -7,12 +7,12 @@ import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
 DATA_SERVERS = [
-    "http://localhost:8012",
-    "http://localhost:8013",
-    "http://localhost:8014",
-    "http://localhost:8015", #Intel
-    "http://localhost:8016",
-    "http://localhost:8017"
+        {"name": "bcd",   "url": "http://localhost:8012"},
+        {"name": "gccs",  "url": "http://localhost:8013"},
+        {"name": "iamd",  "url": "http://localhost:8014"},
+        {"name": "intel", "url": "http://localhost:8015"},
+        {"name": "freq",  "url": "http://localhost:8016"},
+        {"name": "wx",    "url": "http://localhost:8017"},
 ]
 
 # Connection channels
@@ -25,11 +25,14 @@ def build_msn_data(path='/'):
     with open(MSN_DATA_FILE, 'w') as msn_data_file:
         data = {}
         for idx, data_server in enumerate(DATA_SERVERS):
-            content = request.urlopen(f"{data_server}{path}").read().decode()
-            json_data = json.loads(content)
+            try:
+                content = request.urlopen(f"{data_server['url']}{path}").read().decode()
+                json_data = json.loads(content)
 
-            key = list(json_data.keys())[0] # Grab the first key (shop name)
-            data[key] = json_data[key]
+                key = list(json_data.keys())[0] # Grab the first key (shop name)
+                data[key] = json_data[key]
+            except:
+                websockets.broadcast(connections['/msn-controller'], f"Can't reach {data_server['name'].upper()} @ {data_server['url']}")
 
         msn_data_file.write(json.dumps(data))
         msn_data_file.close()
@@ -37,7 +40,8 @@ def build_msn_data(path='/'):
 
 def restore_msn_data():
     for idx, data_server in enumerate(DATA_SERVERS):
-        request.urlopen(f"{data_server}/restore")
+        request.urlopen(f"{data_server['url']}/restore")
+
     websockets.broadcast(connections['/msn-controller'], "Restored MSN Data on MSN Data Servers")
 
 async def socket_handler(websocket, path):
@@ -68,7 +72,7 @@ async def socket_handler(websocket, path):
             elif message.startswith("updateIntel"):
                 data = { 'msn_data': message.split(' ')[1] }
 
-                post_url = DATA_SERVERS[3] + '/updateMsn'
+                post_url = DATA_SERVERS[3]['url'] + '/updateMsn'
                 post_data = parse.urlencode(data).encode()
                 req = request.Request(post_url, data=post_data)
                 resp = request.urlopen(req)
