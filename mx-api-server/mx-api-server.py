@@ -6,12 +6,12 @@ import os
 import socket
 import websockets
 
-MSN_DATA_FILE = 'msn-data.json'
+MX_DATA_FILE = 'mx-data.json'
 DATA_SERVERS = [
-    "http://localhost:8008",
-    "http://localhost:8009",
-    "http://localhost:8010",
-    "http://localhost:8011"
+    { "name": "tv-01", "url": "http://localhost:8008"},
+    { "name": "tv-02", "url": "http://localhost:8009"},
+    { "name": "tv-05", "url": "http://localhost:8010"},
+    { "name": "tv-06", "url": "http://localhost:8011"},
 ]
 
 # Connection channels
@@ -23,14 +23,18 @@ connections = {
 
 # Build MX data from data servers; Path determines source file to build from
 def build_mx_data(path='/'):
-    with open(MSN_DATA_FILE, 'w') as msn_data_file:
+    with open(MX_DATA_FILE, 'w') as msn_data_file:
         msn_data_file.write(f"[\n")
         for idx, data_server in enumerate(DATA_SERVERS):
-            content = urlopen(f"{data_server}{path}").read().decode()
-            if (idx + 1) == len(DATA_SERVERS):
-                msn_data_file.write(f"{content}\n")
-            else:
-                msn_data_file.write(f"{content},\n")
+            try:
+                content = urlopen(f"{data_server['url']}{path}").read().decode()
+                if (idx + 1) == len(DATA_SERVERS):
+                    msn_data_file.write(f"{content}\n")
+                else:
+                    msn_data_file.write(f"{content},\n")
+            except:
+                websockets.broadcast(connections['/mx-controller'], f"Can't reach {data_server['name'].upper()} @ {data_server['url']}")
+
         msn_data_file.write(f"]\n")
         msn_data_file.close()
     websockets.broadcast(connections['/mx-controller'], "Built MX Data on MX API Server")
@@ -38,7 +42,7 @@ def build_mx_data(path='/'):
 # Send GET to all data servers on the restore path
 def restore_mx_data():
     for idx, data_server in enumerate(DATA_SERVERS):
-        content = urlopen(f"{data_server}/restore")
+        content = urlopen(f"{data_server['url']}/restore")
     websockets.broadcast(connections['/mx-controller'], "Restored MX Data on MX Data Servers")
 
 async def socket_handler(websocket, path):
@@ -51,7 +55,7 @@ async def socket_handler(websocket, path):
             print(f"Received message: {message}")
             # Determine action based on message
             if message == "publish":
-                with open(MSN_DATA_FILE) as file:
+                with open(MX_DATA_FILE) as file:
                     data = json.load(file)
                     websockets.broadcast(connections['/mx-dashboard'], json.dumps(data))
                     websockets.broadcast(connections['/mx-controller'], "Published MX Data to MX Dashboard")
@@ -63,7 +67,7 @@ async def socket_handler(websocket, path):
             elif message == "restore":
                 restore_mx_data()
             elif message == "reset":
-                with open(MSN_DATA_FILE, 'w') as msn_data_file:
+                with open(MX_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
                 websockets.broadcast(connections['/mx-controller'], "Reset MX Data on MX API Server")
