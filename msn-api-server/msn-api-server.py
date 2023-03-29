@@ -72,7 +72,10 @@ async def socket_handler(websocket, path):
             elif message.startswith("updateIntel"):
                 data = { 'msn_data': message.split(' ')[1] }
 
-                post_url = DATA_SERVERS[3]['url'] + '/updateMsn'
+                for server in DATA_SERVERS:
+                    if server['name'] == "intel":
+                        post_url = server['url'] + '/updateMsn'
+
                 post_data = parse.urlencode(data).encode()
                 req = request.Request(post_url, data=post_data)
                 resp = request.urlopen(req)
