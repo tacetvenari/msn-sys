@@ -11,10 +11,10 @@ export default function usePersistentSocket(url, opts){
   });
 
   const connectionStatus = {
-    [ReadyState.CONNECTING]: { label: 'Connecting', color: 'gray.500'},
+    [ReadyState.CONNECTING]: { label: 'Connecting', color: 'yellow.500'},
     [ReadyState.OPEN]: { label: 'Open', color: 'green.500'},
-    [ReadyState.CLOSING]: { label: 'Closing', color: 'gray.500'},
-    [ReadyState.CLOSED]: { label: 'Closed', color: 'gray.500'},
+    [ReadyState.CLOSING]: { label: 'Closing', color: 'red.500'},
+    [ReadyState.CLOSED]: { label: 'Closed', color: 'red.500'},
     [ReadyState.UNINSTANTIATED]: { label: 'Uninstantiated', color: 'gray.500'},
   }[readyState];
 
