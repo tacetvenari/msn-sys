@@ -1,0 +1,137 @@
+services:
+  dashboard:
+    image: tv-dashboard
+    build:
+      context: .
+      target: dashboard
+    ports:
+      - "1000:5173"
+    environment:
+      - VITE_MSN_NUMBER=1337
+      - VITE_MSN_PLATFORM=F-16
+      - VITE_MSN_TAKEOFF=0900
+      - VITE_MSN_RETURN=0930
+      - VITE_SHOPS=BCD GCCS IAMD INTEL FREQ WX
+
+      - VITE_WS_MSN_URI=msn-api
+      - VITE_WS_MSN_PORT=8889
+      - VITE_WS_MSN_PATH=msn-dashboard
+      - VITE_WS_MSN_CONTROL_PATH=msn-controller
+
+      - VITE_WS_MX_URI=mx-api
+      - VITE_WS_MX_PORT=8888
+      - VITE_WS_MX_PATH=mx-dashboard
+      - VITE_WS_MX_CONTROL_PATH=mx-controller
+
+
+  msn-api:
+    image: tv-msn-api-server
+    build:
+      context: .
+      target: msn-api-server
+    ports:
+      - "1010:8889"
+    environment:
+      - VITE_DATA_SERVERS=http://msn-data-1:8012 http://msn-data-2:8012 http://msn-data-3:8012 http://msn-data-4:8012 http://msn-data-5:8012 http://msn-data-6:8012
+
+  msn-data-1:
+    image: tv-msn-data-server
+    build:
+      context: .
+      target: msn-data-server
+    ports:
+      - "1011:8012"
+    command: make start p=8012 t=bcd
+
+  msn-data-2:
+    image: tv-msn-data-server
+    build:
+      context: .
+      target: msn-data-server
+    ports:
+      - "1012:8012"
+    command: make start p=8012 t=gccs
+
+  msn-data-3:
+    image: tv-msn-data-server
+    build:
+      context: .
+      target: msn-data-server
+    ports:
+      - "1013:8012"
+    command: make start p=8012 t=iamd
+
+  msn-data-4:
+    image: tv-msn-data-server
+    build:
+      context: .
+      target: msn-data-server
+    ports:
+      - "1014:8012"
+    command: make start p=8012 t=intel
+
+  msn-data-5:
+    image: tv-msn-data-server
+    build:
+      context: .
+      target: msn-data-server
+    ports:
+      - "1015:8012"
+    command: make start p=8012 t=freq
+
+  msn-data-6:
+    image: tv-msn-data-server
+    build:
+      context: .
+      target: msn-data-server
+    ports:
+      - "1016:8012"
+    command: make start p=8012 t=wx
+
+  mx-api:
+    image: tv-mx-api-server
+    build:
+      context: .
+      target: mx-api-server
+    ports:
+      - "1020:8888"
+    environment:
+      - VITE_DATA_SERVERS=http://mx-data-1:8008 http://mx-data-2:8008 http://mx-data-3:8008 http://mx-data-4:8008
+     
+  mx-data-1:
+    image: tv-mx-data-server
+    build:
+      context: .
+      target: mx-data-server
+    ports:
+      - "1021:8008"
+    command: make start p=8008 t=tv-01
+
+  mx-data-2:
+    image: tv-mx-data-server
+    build:
+      context: .
+      target: mx-data-server
+    ports:
+      - "1022:8008"
+    command: make start p=8008 t=tv-02
+
+  mx-data-3:
+    image: tv-mx-data-server
+    build:
+      context: .
+      target: mx-data-server
+    ports:
+      - "1023:8008"
+    command: make start p=8008 t=tv-05
+
+  mx-data-4:
+    image: tv-mx-data-server
+    build:
+      context: .
+      target: mx-data-server
+    ports:
+      - "1024:8008"
+    command: make start p=8008 t=tv-06
+
+    

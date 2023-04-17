@@ -6,7 +6,7 @@ A modern lightweight mission system used to support TV events. It provides MDTs 
 
 ### Dashboard (`./dashboard`)
 
-This exposes a dashbaord UI (`5173` by default) that connects to the two API servers via websockets. The valid routes are:
+This exposes a dashboard UI (`5173` by default) that connects to the two API servers via websockets. The valid routes are:
 
  - `/` - Displays links to the two available dashboards
  - `/msn` - Mission dashboard
@@ -36,3 +36,6 @@ This server exposes a couple REST endpoints to send/receive data (`8008` by defa
 
   - GET `/` will return the content of `./data.json`
   - POST `/` will write the request content to `./log`
+
+# DOCKER NOTES
+  The computers viewing the dashboard need access to API Containers!
