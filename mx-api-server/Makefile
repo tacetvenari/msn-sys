@@ -9,3 +9,6 @@ control:
 
 dash:
 	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/mx-dashboard
+
+sortie:
+	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/mx-sortie-state

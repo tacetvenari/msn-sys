@@ -6,58 +6,81 @@ import os
 import socket
 import websockets
 
-MSN_DATA_FILE = 'msn-data.json'
-DATA_SERVERS=os.environ["VITE_DATA_SERVERS"].split(" ")
-#DATA_SERVERS = [
-#    "http://mx-data-1:8008",
-#    "http://mx-data-2:8008",
-#    "http://mx-data-3:8008",
-#    "http://mx-data-4:8008"
-#]
+
+MX_DATA_FILE = 'mx-data.json'
+DATA_SERVERS = [
+    { "name": "tv-01", "url": "http://localhost:8008"},
+    { "name": "tv-02", "url": "http://localhost:8009"},
+    { "name": "tv-05", "url": "http://localhost:8010"},
+    { "name": "tv-06", "url": "http://localhost:8011"},
+]
 
 # Connection channels
 connections = {
     '/mx-controller': set(),
-    '/mx-dashboard': set()
+    '/mx-dashboard': set(),
+    '/mx-sortie-state': set()
 }
 
-def build_msn_data(path='/'):
-    with open(MSN_DATA_FILE, 'w') as msn_data_file:
+# Build MX data from data servers; Path determines source file to build from
+def build_mx_data(path='/'):
+    with open(MX_DATA_FILE, 'w') as msn_data_file:
         msn_data_file.write(f"[\n")
         for idx, data_server in enumerate(DATA_SERVERS):
-            content = urlopen(f"{data_server}{path}").read().decode()
-            if (idx + 1) == len(DATA_SERVERS):
-                msn_data_file.write(f"{content}\n")
-            else:
-                msn_data_file.write(f"{content},\n")
+            try:
+                content = urlopen(f"{data_server['url']}{path}").read().decode()
+                if (idx + 1) == len(DATA_SERVERS):
+                    msn_data_file.write(f"{content}\n")
+                else:
+                    msn_data_file.write(f"{content},\n")
+            except:
+                websockets.broadcast(connections['/mx-controller'], f"Can't reach {data_server['name'].upper()} @ {data_server['url']}")
+
         msn_data_file.write(f"]\n")
         msn_data_file.close()
-    websockets.broadcast(connections['/mx-controller'], "{'build': true}")
+    websockets.broadcast(connections['/mx-controller'], "Built MX Data on MX API Server")
 
+# Send GET to all data servers on the restore path
+def restore_mx_data():
+    for idx, data_server in enumerate(DATA_SERVERS):
+        content = urlopen(f"{data_server['url']}/restore")
+    websockets.broadcast(connections['/mx-controller'], "Restored MX Data on MX Data Servers")
 
 async def socket_handler(websocket, path):
     # Register connection
     connections[path].add(websocket)
 
+    # Handle websocket messages
     try:
         async for message in websocket:
             print(f"Received message: {message}")
             # Determine action based on message
             if message == "publish":
-                with open(MSN_DATA_FILE) as file:
+                with open(MX_DATA_FILE) as file:
                     data = json.load(file)
                     websockets.broadcast(connections['/mx-dashboard'], json.dumps(data))
-                    websockets.broadcast(connections['/mx-controller'], "{'publish': true}")
+                    websockets.broadcast(connections['/mx-controller'], "Published MX Data to MX Dashboard")
                     file.close()
             elif message == "build":
-                build_msn_data()
+                build_mx_data()
             elif message == "return":
-                build_msn_data('/return')
+                build_mx_data("/return")
+            elif message == "restore":
+                restore_mx_data()
             elif message == "reset":
-                with open(MSN_DATA_FILE, 'w') as msn_data_file:
+                with open(MX_DATA_FILE, 'w') as msn_data_file:
                     msn_data_file.write(f"[]")
                     msn_data_file.close()
-                websockets.broadcast(connections['/mx-controller'], "{'reset': true}")
+                websockets.broadcast(connections['/mx-controller'], "Reset MX Data on MX API Server")
+            elif message == "sortie-land":
+                websockets.broadcast(connections['/mx-sortie-state'], "land")
+                websockets.broadcast(connections['/mx-controller'], "Sortie state: LANDED")
+            elif message == "sortie-takeoff":
+                websockets.broadcast(connections['/mx-sortie-state'], "takeoff")
+                websockets.broadcast(connections['/mx-controller'], "Sortie state: TAKEOFF")
+            elif message == "sortie-canx":
+                websockets.broadcast(connections['/mx-sortie-state'], "canx")
+                websockets.broadcast(connections['/mx-controller'], "Sortie state: CANXD")
 
     finally:
         # Unregister connection
