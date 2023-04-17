@@ -121,14 +121,16 @@ export default function AirTaskingOrderCard({msnData}){
   // The defaultProps get overwritten when an empty object is passed in
   // There must be a better pattern for this
   const {intel = {}} = msnData
-  const {msn_id: msnId = "unk"} = intel
-
+  var {msn_id: msnId = "unk"} = intel
+  if(msnData.hasOwnProperty('INTEL')){
+    msnId = msnData.INTEL.msn_id
+  }
   return (
     <Card px={4} py={2}>
       <Stack spacing={6}>
         <Heading size="lg">{`Mission ${msnId.toUpperCase()}`}</Heading>
         <MissionStatus states={msnData} />
-        <MissionMeta intel={intel}/>
+        <MissionMeta intel={msnData.INTEL}/>
       </Stack>
     </Card>
   )

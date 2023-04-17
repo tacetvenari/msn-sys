@@ -43,7 +43,7 @@ class Server(BaseHTTPRequestHandler):
                 shopData = json.load(file)
 
                 # If not intel, strip msn meta data
-                if SHOP == "intel":
+                if SHOP.lower() == "intel":
                     data[SHOP] = shopData
                 else:
                     data[SHOP] = {key:shopData[key] for key in shopData if key == 'status'}
