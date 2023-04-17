@@ -36,3 +36,6 @@ This server exposes a couple REST endpoints to send/receive data (`8008` by defa
 
   - GET `/` will return the content of `./data.json`
   - POST `/` will write the request content to `./log`
+
+# DOCKER NOTES
+  The computers viewing the dashboard need access to API Containers!

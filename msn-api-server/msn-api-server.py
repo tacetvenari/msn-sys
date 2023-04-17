@@ -3,6 +3,7 @@ from urllib import request, parse
 import asyncio
 import json
 import socket
+import os
 import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
@@ -14,6 +15,7 @@ DATA_SERVERS = [
         {"name": "freq",  "url": "http://localhost:8016"},
         {"name": "wx",    "url": "http://localhost:8017"},
 ]
+
 
 # Connection channels
 connections = {

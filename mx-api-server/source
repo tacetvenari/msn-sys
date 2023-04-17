@@ -1,0 +1,2 @@
+#!/bin/bash
+VITE_DATA_SERVERS=http://mx-data-1:8008 http://mx-data-2:8008 http://mx-data-3:8008 http://mx-data-4:8008

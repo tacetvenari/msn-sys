@@ -6,6 +6,7 @@ import os
 import socket
 import websockets
 
+
 MX_DATA_FILE = 'mx-data.json'
 DATA_SERVERS = [
     { "name": "tv-01", "url": "http://localhost:8008"},

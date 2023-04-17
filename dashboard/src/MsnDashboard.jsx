@@ -11,6 +11,7 @@ import usePersistentSocket from './usePersistentSocket'
 const {VITE_WS_MSN_URI, VITE_WS_MSN_PORT, VITE_WS_MSN_PATH} = import.meta.env
 
 export default function MsnDashboard(){
+
   const [msnState, setMsnState] = React.useState({ intel: {}})
   const { lastMessage, connectionStatus } = usePersistentSocket(`ws://${VITE_WS_MSN_URI}:${VITE_WS_MSN_PORT}${VITE_WS_MSN_PATH}`);
 
