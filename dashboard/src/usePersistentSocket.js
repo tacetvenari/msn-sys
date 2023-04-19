@@ -5,16 +5,16 @@ export default function usePersistentSocket(url, opts){
   const didUnmount = useRef(false)
   const { sendMessage, lastMessage, readyState } = useWebSocket(url,{
     shouldReconnect: () => didUnmount.current === false,
-    reconnectAttempts: 10,
-    reconnectInterval: 1000,
+    reconnectAttempts: 1440, // At 5 second interval, this will try for 2 hours
+    reconnectInterval: 5000,
     ...opts
   });
 
   const connectionStatus = {
-    [ReadyState.CONNECTING]: { label: 'Connecting', color: 'gray.500'},
+    [ReadyState.CONNECTING]: { label: 'Connecting', color: 'yellow.500'},
     [ReadyState.OPEN]: { label: 'Open', color: 'green.500'},
-    [ReadyState.CLOSING]: { label: 'Closing', color: 'gray.500'},
-    [ReadyState.CLOSED]: { label: 'Closed', color: 'gray.500'},
+    [ReadyState.CLOSING]: { label: 'Closing', color: 'red.500'},
+    [ReadyState.CLOSED]: { label: 'Closed', color: 'red.500'},
     [ReadyState.UNINSTANTIATED]: { label: 'Uninstantiated', color: 'gray.500'},
   }[readyState];
 
@@ -24,6 +24,7 @@ export default function usePersistentSocket(url, opts){
     sendMessage,
     lastMessage,
     readyState,
-    connectionStatus
+    connectionStatus,
+    statusCode: readyState
   }
 }

@@ -1,5 +1,6 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
+import shutil
 
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
@@ -14,17 +15,30 @@ class Server(BaseHTTPRequestHandler):
     def do_GET(self):
         files = {
             "/": "mx-data.json",
+            "/restore": "backup-mx-data.json",
             "/return": "return-mx-data.json"
         }
 
-        with open(files[self.path]) as file:
-            data = json.load(file)
-            data['tailnumber'] = TAILNUMBER
+        if self.path == "/favicon.ico": # Ignore favicon requests
+            return False
+        elif self.path == "/restore": # Restore backup data
+            print("Restoring data...")
+            message = { "message" : "Restore complete"}
+
+            shutil.copy(files['/restore'], files['/']) # Overwrite data with backup
 
             self._set_headers()
-            self.wfile.write(json.dumps(data).encode('utf-8'))
+            self.wfile.write(json.dumps(message).encode('utf-8'))
+        else: # Respond with JSON
 
-            file.close()
+            with open(files[self.path]) as file:
+                data = json.load(file)
+                data['tailnumber'] = TAILNUMBER
+
+                self._set_headers()
+                self.wfile.write(json.dumps(data).encode('utf-8'))
+
+                file.close()
 
     # POST writes data to log and returns the data written
     def do_POST(self):

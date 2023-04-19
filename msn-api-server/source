@@ -1,0 +1,2 @@
+#!/bin/bash
+VITE_DATA_SERVERS = http://msn-data-1:8012 http://msn-data-2:8012 http://msn-data-3:8012 http://msn-data-4:8012 http://msn-data-5:8012 http://msn-data-6:8012

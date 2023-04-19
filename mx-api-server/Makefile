@@ -1,4 +1,4 @@
-LOCAL_IP=$$(ifconfig en0 | awk '/inet / {print $$2}')
+LOCAL_IP=$$(python3 -c 'import socket; ip=socket.gethostbyname(socket.gethostname()); print(ip)')
 WS_PORT=8888
 
 start:
@@ -9,3 +9,6 @@ control:
 
 dash:
 	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/mx-dashboard
+
+sortie:
+	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/mx-sortie-state

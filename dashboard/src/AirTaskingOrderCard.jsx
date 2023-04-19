@@ -9,7 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 
-const {VITE_MSN_NUMBER, VITE_MSN_PLATFORM, VITE_MSN_TAKEOFF, VITE_MSN_RETURN, VITE_SHOPS} = import.meta.env
+const {VITE_SHOPS} = import.meta.env
 const SHOPS = VITE_SHOPS.split(' ')
 
 function MetaSection({label, value}){
@@ -22,32 +22,53 @@ function MetaSection({label, value}){
   )
 }
 
-MetaSection.propTypes = {
-  label: PropTypes.string.isRequired,
-  value: PropTypes.string.isRequired
+MetaSection.defaultProps = {
+  value: 'unk'
 }
 
-function MissionMeta({target}){
+MetaSection.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string
+}
+
+function MissionMeta({intel}){
+  const { 
+    msn_takeoff: msnTakeoff, 
+    msn_return: msnReturn, 
+    msn_platform: msnPlatform, 
+    msn_target: msnTarget 
+  } = intel
   return (
     <Stack>
       <Heading size="md">Mission Data</Heading>
       <Divider />
-      <HStack justifyContent="center" spacing={16}>
-        <MetaSection label="Takeoff" value={VITE_MSN_TAKEOFF} />
-        <MetaSection label="Return" value={VITE_MSN_RETURN} />
-        <MetaSection label="Platform" value={VITE_MSN_PLATFORM} />
-        <MetaSection label="Target" value={target} />
+      <HStack justifyContent="center" spacing={8}>
+        <MetaSection label="Takeoff" value={msnTakeoff} />
+        <MetaSection label="Return" value={msnReturn} />
+        <MetaSection label="Platform" value={msnPlatform} />
+        <MetaSection label="Target" value={msnTarget} />
       </HStack>
     </Stack>
   )
 }
 
 MissionMeta.defaultProps = {
-  target: "unk"
+  intel: PropTypes.shape({
+    msn_takeoff: 'unk',
+    msn_return: 'unk',
+    msn_platform: 'unk',
+    msn_target: 'unk',
+  })
 }
 
 MissionMeta.propTypes = {
-  target: PropTypes.string
+  intel: PropTypes.shape({
+    msn_id: PropTypes.string,
+    msn_takeoff: PropTypes.string,
+    msn_return: PropTypes.string,
+    msn_platform: PropTypes.string,
+    msn_target: PropTypes.string,
+  })
 }
 
 function Status({label, state, delay}){
@@ -75,9 +96,9 @@ function MissionStatus({states}){
     <Stack>
       <Heading size="md">Mission Status</Heading>
       <Divider />
-      <HStack justifyContent="center" spacing={6}>
+      <HStack justifyContent="center" spacing={4}>
         {SHOPS.map((shop, idx) => {
-          const currentState = states[shop] ? states[shop].status : 'unk'
+          const currentState = states[shop] && states[shop].status ? states[shop].status : 'unk'
           const delay = idx * 0.5
 
           return(
@@ -90,27 +111,47 @@ function MissionStatus({states}){
 
 MissionStatus.propTypes = {
   states: PropTypes.shape({
-    intel: PropTypes.string
+    intel: PropTypes.shape({
+      status: PropTypes.string
+    })
   }).isRequired
 }
 
 export default function AirTaskingOrderCard({msnData}){
-  const {target, ...states} = msnData
-
+  // The defaultProps get overwritten when an empty object is passed in
+  // There must be a better pattern for this
+  const {intel = {}} = msnData
+  var {msn_id: msnId = "unk"} = intel
+  if(msnData.hasOwnProperty('INTEL')){
+    msnId = msnData.INTEL.msn_id
+  }
   return (
     <Card px={4} py={2}>
       <Stack spacing={6}>
-        <Heading size="lg">{`Mission ${VITE_MSN_NUMBER}`}</Heading>
-        <MissionStatus states={states} />
-        <MissionMeta target={target}/>
+        <Heading size="lg">{`Mission ${msnId.toUpperCase()}`}</Heading>
+        <MissionStatus states={msnData} />
+        <MissionMeta intel={msnData.INTEL}/>
       </Stack>
     </Card>
   )
 }
 
+AirTaskingOrderCard.defaultProps = {
+  msnData: {
+    intel: {
+      msn_id: 'unk'
+    }
+  }
+}
+
 AirTaskingOrderCard.propTypes = {
   msnData: PropTypes.shape({
-    target: PropTypes.string,
-    intel: PropTypes.shape({})
-  }).isRequired,
+    intel: PropTypes.shape({
+      msn_id: PropTypes.string,
+      msn_takeoff: PropTypes.string,
+      msn_return: PropTypes.string,
+      msn_platform: PropTypes.string,
+      msn_target: PropTypes.string,
+    })
+  })
 }
