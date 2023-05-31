@@ -4,7 +4,11 @@ import shutil
 import socket
 from time import sleep
 from threading import Thread
+import asyncio
+from websockets.sync.client import connect
+from sys import argv
 
+CHECKIN_TIMER=5
 IPADDR=socket.gethostbyname(socket.gethostname())
 
 class Server(BaseHTTPRequestHandler):
@@ -66,23 +70,34 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='
 
 def check_in():
     while True:
-        sleep(5)
-        print("test")
+        sleep(CHECKIN_TIMER)
+        # Connect to the API Server
+        with connect(f"ws://{API_IP}:{API_PORT}/check-in") as websocket:
+        # Send Command to check-in
+            websocket.send(f"check-in {IPADDR} {PORT} {TAILNUMBER}")
+            message=""
+            while True:
+                if ("FAIL" in message) or ("CLOSE" == message):
+                    break 
+                message = websocket.recv()
+                # Receive/Handle Errors
+                print(f"Received: {message}")
+        
     
 def server():
     try:
-        PORT = int(argv[1])
-        TAILNUMBER = str(argv[2])
         run(port=PORT, tailnumber=TAILNUMBER)
-
     except:
         print('Missing args:')
-        print('> python3 data-server.py [PORT] [TAILNUMBER]')
+        print('> python3 data-server.py PORT TAILNUMBER API_IP API_PORT')
         exit()
     
 
 if __name__ == '__main__':
-    from sys import argv
+    PORT = int(argv[1])
+    TAILNUMBER = str(argv[2])
+    API_IP = argv[3]
+    API_PORT = argv[4]
 
     server_thread=Thread(target=server)
     check_in_thread = Thread(target=check_in)

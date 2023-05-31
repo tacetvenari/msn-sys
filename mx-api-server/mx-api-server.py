@@ -125,6 +125,7 @@ async def check_in(message):
     d_server['url']=f"http://{cmd[1]}:{cmd[2]}"
     print(DATA_SERVERS)
     websockets.broadcast(connections['/check-in'], f"Checked in {d_server}")
+    websockets.broadcast(connections['/check-in'], "CLOSE")
     
     
 
