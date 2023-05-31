@@ -2,6 +2,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import shutil
 import socket
+from time import sleep
+from threading import Thread
+
 IPADDR=socket.gethostbyname(socket.gethostname())
 
 class Server(BaseHTTPRequestHandler):
@@ -35,6 +38,7 @@ class Server(BaseHTTPRequestHandler):
 
             with open(files[self.path]) as file:
                 data = json.load(file)
+                TAILNUMBER = str(argv[2])
                 data['tailnumber'] = TAILNUMBER
 
                 self._set_headers()
@@ -60,9 +64,12 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='
     print('Starting MX Data Server on port %d...' % port)
     httpd.serve_forever()
 
-if __name__ == '__main__':
-    from sys import argv
-
+def check_in():
+    while True:
+        sleep(5)
+        print("test")
+    
+def server():
     try:
         PORT = int(argv[1])
         TAILNUMBER = str(argv[2])
@@ -71,3 +78,21 @@ if __name__ == '__main__':
     except:
         print('Missing args:')
         print('> python3 data-server.py [PORT] [TAILNUMBER]')
+        exit()
+    
+
+if __name__ == '__main__':
+    from sys import argv
+
+    server_thread=Thread(target=server)
+    check_in_thread = Thread(target=check_in)
+    
+    server_thread.start()
+    check_in_thread.start()
+    
+    server_thread.join()
+    check_in_thread.join()
+    
+    
+
+    
