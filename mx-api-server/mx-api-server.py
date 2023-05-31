@@ -5,8 +5,6 @@ import json
 import os
 import socket
 import websockets
-import re
-
 
 MX_DATA_FILE = 'mx-data.json'
 DATA_SERVERS = [
@@ -107,7 +105,7 @@ async def check_in(message):
     # Does Data server exist?
     d_server = next((item for item in DATA_SERVERS if item["name"] == cmd[3]), False)
     if d_server == False:
-        websockets.broadcast(connections['/check-in'], f"\'{cmd[3]}\' is not a valid data server")
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[3]}\' is not a valid data server")
         return
     # Is IP valid?
     ip=cmd[1].split(".")
@@ -116,11 +114,11 @@ async def check_in(message):
         int(ip[1]) in range(0,255) and \
         int(ip[2]) in range(0,255) and \
         int(ip[3]) in range(0,255)):
-        websockets.broadcast(connections['/check-in'], f"\'{cmd[1]}\' is not a valid ip_address")
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[1]}\' is not a valid ip_address")
         return
     # Is Port valid?
     if not (int(cmd[2]) in range(0,65535)):
-        websockets.broadcast(connections['/check-in'], f"\'{cmd[2]}\' is not a valid port")
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[2]}\' is not a valid port")
         return
     
     # Check-in the Data server
