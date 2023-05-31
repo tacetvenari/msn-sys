@@ -19,7 +19,8 @@ DATA_SERVERS = [
 connections = {
     '/mx-controller': set(),
     '/mx-dashboard': set(),
-    '/mx-sortie-state': set()
+    '/mx-sortie-state': set(),
+    '/check-in': set()
 }
 
 # Build MX data from data servers; Path determines source file to build from
@@ -81,6 +82,8 @@ async def socket_handler(websocket, path):
             elif message == "sortie-canx":
                 websockets.broadcast(connections['/mx-sortie-state'], "canx")
                 websockets.broadcast(connections['/mx-controller'], "Sortie state: CANXD")
+            elif "check-in" in message:
+                websockets.broadcast(connections['/check-in'], "Test")
 
     finally:
         # Unregister connection
