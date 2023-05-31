@@ -1,6 +1,8 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import shutil
+import socket
+IPADDR=socket.gethostbyname(socket.gethostname())
 
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
