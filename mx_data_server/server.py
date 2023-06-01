@@ -66,13 +66,13 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='
     print('Starting MX Data Server on port %d...' % port)
     httpd.serve_forever()
 
-def check_in(test, PORT, TAILNUMBER, API_IP, API_PORT):
+def check_in(test, PORT, NAME, API_IP, API_PORT):
     while True:
         sleep(CHECKIN_TIMER)
         # Connect to the API Server
         with connect(f"ws://{API_IP}:{API_PORT}/check-in") as websocket:
         # Send Command to check-in
-            websocket.send(f"check-in {IPADDR} {PORT} {TAILNUMBER}")
+            websocket.send(f"check-in {IPADDR} {PORT} {NAME}")
             message=""
             while True:
                 if ("FAIL" in message) or ("CLOSE" == message):
