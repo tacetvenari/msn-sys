@@ -91,10 +91,10 @@ async def socket_handler(websocket, path):
 async def check_in(message):
     # Test Brodcast
     websockets.broadcast(connections['/check-in'], "Checking in")
-    
+
     # Split message on spaces
     cmd=message.split(" ")
-    
+
     # Check if enough arguments
     if len(cmd) != 4:
         help_msg= \
@@ -120,14 +120,14 @@ async def check_in(message):
     if not (int(cmd[2]) in range(0,65535)):
         websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[2]}\' is not a valid port")
         return
-    
+
     # Check-in the Data server
     d_server['url']=f"http://{cmd[1]}:{cmd[2]}"
     print(DATA_SERVERS)
     websockets.broadcast(connections['/check-in'], f"Checked in {d_server}")
     websockets.broadcast(connections['/check-in'], "CLOSE")
-    
-    
+
+
 
 async def main(local_ip='localhost', port=8888):
     print(f'Starting websocket server at {local_ip}:{port}...')
