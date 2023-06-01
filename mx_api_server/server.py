@@ -28,6 +28,7 @@ def build_mx_data(path='/'):
         msn_data_file.write(f"[\n")
         for idx, data_server in enumerate(DATA_SERVERS):
             try:
+                print(f">>{data_server['url']}{path}")
                 content = urlopen(f"{data_server['url']}{path}").read().decode()
                 if (idx + 1) == len(DATA_SERVERS):
                     msn_data_file.write(f"{content}\n")
@@ -123,7 +124,7 @@ async def check_in(message):
 
     # Check-in the Data server
     d_server['url']=f"http://{cmd[1]}:{cmd[2]}"
-    print(DATA_SERVERS)
+    # print(DATA_SERVERS)
     websockets.broadcast(connections['/check-in'], f"Checked in {d_server}")
     websockets.broadcast(connections['/check-in'], "CLOSE")
 
