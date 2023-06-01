@@ -20,7 +20,8 @@ DATA_SERVERS = [
 # Connection channels
 connections = {
     '/msn-controller': set(),
-    '/msn-dashboard': set()
+    '/msn-dashboard': set(),
+    '/check-in': set()
 }
 
 def build_msn_data(path='/'):
@@ -87,6 +88,47 @@ async def socket_handler(websocket, path):
     finally:
         # Unregister connection
         connections[path].remove(websocket)
+
+async def check_in(message):
+    # Test Brodcast
+    websockets.broadcast(connections['/check-in'], "Checking in")
+
+    # Split message on spaces
+    cmd=message.split(" ")
+
+    # Check if enough arguments
+    if len(cmd) != 4:
+        help_msg= \
+        '''Invalid number of arguments:
+        check-in IP_ADDR PORT SYSTEM_NAME'''
+        websockets.broadcast(connections['/check-in'], help_msg)
+        return
+    # Does Data server exist?
+    d_server = next((item for item in DATA_SERVERS if item["name"] == cmd[3]), False)
+    if d_server == False:
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[3]}\' is not a valid data server")
+        return
+    # Is IP valid?
+    ip=cmd[1].split(".")
+    if not (len(ip) == 4 and \
+        int(ip[0]) in range(0,255) and \
+        int(ip[1]) in range(0,255) and \
+        int(ip[2]) in range(0,255) and \
+        int(ip[3]) in range(0,255)):
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[1]}\' is not a valid ip_address")
+        return
+    # Is Port valid?
+    if not (int(cmd[2]) in range(0,65535)):
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[2]}\' is not a valid port")
+        return
+
+    # Check-in the Data server
+    d_server['url']=f"http://{cmd[1]}:{cmd[2]}"
+    # print(DATA_SERVERS)
+    websockets.broadcast(connections['/check-in'], f"Checked in {d_server}")
+    websockets.broadcast(connections['/check-in'], "CLOSE")
+
+
 
 async def main(local_ip='localhost', port=8888):
     print(f'Starting websocket server at {local_ip}:{port}...')

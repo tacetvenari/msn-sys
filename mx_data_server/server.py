@@ -4,7 +4,6 @@ import shutil
 import socket
 from time import sleep
 from threading import Thread
-import asyncio
 from websockets.sync.client import connect
 from sys import argv
 
@@ -39,7 +38,6 @@ class Server(BaseHTTPRequestHandler):
             self._set_headers()
             self.wfile.write(json.dumps(message).encode('utf-8'))
         else: # Respond with JSON
-
             with open(files[self.path]) as file:
                 data = json.load(file)
                 TAILNUMBER = str(argv[2])
@@ -68,7 +66,7 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='
     print('Starting MX Data Server on port %d...' % port)
     httpd.serve_forever()
 
-def check_in():
+def check_in(test, PORT, TAILNUMBER, API_IP, API_PORT):
     while True:
         sleep(CHECKIN_TIMER)
         # Connect to the API Server
@@ -78,20 +76,21 @@ def check_in():
             message=""
             while True:
                 if ("FAIL" in message) or ("CLOSE" == message):
-                    break 
+                    break
                 message = websocket.recv()
                 # Receive/Handle Errors
                 print(f"Received: {message}")
-        
-    
+        if test == True:
+            break
+
 def server():
     try:
         run(port=PORT, tailnumber=TAILNUMBER)
     except:
         print('Missing args:')
-        print('> python3 data-server.py PORT TAILNUMBER API_IP API_PORT')
+        print('> python server.py PORT TAILNUMBER API_IP API_PORT')
         exit()
-    
+
 
 if __name__ == '__main__':
     PORT = int(argv[1])
@@ -100,14 +99,14 @@ if __name__ == '__main__':
     API_PORT = argv[4]
 
     server_thread=Thread(target=server)
-    check_in_thread = Thread(target=check_in)
-    
+    check_in_thread = Thread(target=check_in, args=[False, PORT, TAILNUMBER, API_IP, API_PORT])
+
     server_thread.start()
     check_in_thread.start()
-    
+
     server_thread.join()
     check_in_thread.join()
-    
-    
 
-    
+
+
+
