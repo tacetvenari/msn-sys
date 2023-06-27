@@ -82,8 +82,9 @@ async def socket_handler(websocket, path):
                 post_data = parse.urlencode(data).encode()
                 req = request.Request(post_url, data=post_data)
                 resp = request.urlopen(req)
-
                 websockets.broadcast(connections['/msn-controller'], "Updated Intel mission data")
+            elif message.startswith('check-in'):
+                await check_in(message)
 
     finally:
         # Unregister connection
