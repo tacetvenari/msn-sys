@@ -1,75 +1,40 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
-from urllib import parse
-import base64
+#!/usr/bin/env python
 import json
-import logging
-from sys import argv
-
-class Server(BaseHTTPRequestHandler):
-    def _set_headers(self):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-
-    def do_HEAD(self):
-        self._set_headers()
-
-    # POST writes data to log and returns the data written
-    def do_POST(self):
-        if self.path == "/":
-            with open('log', 'a') as log:
-                content = self.rfile.read(int(self.headers.get("Content-Length")))
-                logging.info("received")
-                self._set_headers()
-                self.wfile.write(content)
-
-        elif self.path == "/updateMX":
-            base64_content = parse.unquote_plus(self.rfile.read(int(self.headers.get("Content-Length"))).decode("utf-8").split("data=")[1])
-            new_content = json.loads(base64.b64decode(base64_content))
-            content = {}
-
-            # Read file
-            with open("mx-data.json", "r") as msnfile:
-                content = json.load(msnfile)
-                msnfile.close()
-
-            # Update content
-            for key in new_content:
-                content[key] = new_content[key]
-
-            # Write file
-            with open("mx-data.json", "w") as msnfile:
-                json.dump(content, msnfile)
-                msnfile.close()
-
-            message = { "message" : "MX data updated"}
-
-            self._set_headers()
-            self.wfile.write(json.dumps(message).encode('utf-8'))
-
-def run(server_class=HTTPServer, handler_class=Server, port=8008, name='unk'):
-    server_address = ('', port)
-    httpd = server_class(server_address, handler_class)
-
-    print('Starting %s Data Server on port %d...' % (name.upper(), port))
-    httpd.serve_forever()
-
-
-if __name__ == '__main__':
-
-
-    try:
-        PORT = int(argv[1])
-        NAME = str(argv[2])
-        run(port=PORT, name=NAME)
-
-    except:
-        run()
-        #print('Missing args:')
-        #print('> python server.py PORT SHOP API_IP API_PORT')
-        #exit()
+import asyncio
+from websockets.server import serve
 
 
 
+async def receive_file(websocket, msg, client_str):
+    print(f"received: {msg} - {client_str}")
+    if msg["seq"] < 0:
+        message_ids.append(msg["id"])
+        messages.append([""]*(abs(msg["seq"])+1))
+        msg["seq"] = 0
+    messages[message_ids.index(msg["id"])][msg["seq"]]=msg['data']
+    if not ("" in messages[message_ids.index(msg["id"])]):
+        joined_msg="".join(messages[message_ids.index(msg["id"])])
+        print(joined_msg)
+    print("sending: ok")
+    await websocket.send("ok")
 
+async def receive(websocket):
+    client_str = f'{websocket.remote_address[0]}:{websocket.remote_address[1]}'
+    async for message in websocket:
+        msg = json.loads(message)
+        if msg["id"] == "msg":
+            data=msg["data"]
+            print(f"received: {data} - {client_str}")
+            print("sending: ok")
+            await websocket.send("ok")
+        else:
+            await receive_file(websocket, msg, client_str)
 
+async def main():
+    print("Starting Server")
+    async with serve(receive, "127.0.0.1", 8080):
+        await asyncio.Future()  # run forever
+
+message_ids=[]
+messages=[]
+asyncio.run(main())

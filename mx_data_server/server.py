@@ -1,11 +1,33 @@
-from http.server import BaseHTTPRequestHandler, HTTPServer
+#!/usr/bin/env python
 import json
 import shutil
 import socket
+import logging
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from time import sleep
 from threading import Thread
 from websockets.sync.client import connect
 from sys import argv
+from os import stat
+from math import ceil
+from time import time
+from websockets.sync.client import connect
+
+
+FILE_SIZE_LIMIT=1024
+
+def send_data(data):
+    with connect("ws://127.0.0.1:8080") as websocket:
+        websocket.send(data)
+        print(f"Sending: {data}")
+        msg = websocket.recv()
+        print(f"Received: {msg}")
+
+def send_msg(data):
+    msg=json.dumps({"id":"msg", "data":data})
+    send_data(msg)
+
+
 
 CHECKIN_TIMER=5
 IPADDR=socket.gethostbyname(socket.gethostname())
@@ -38,15 +60,18 @@ class Server(BaseHTTPRequestHandler):
             self._set_headers()
             self.wfile.write(json.dumps(message).encode('utf-8'))
         else: # Respond with JSON
+            json_text=""
             with open(files[self.path]) as file:
                 data = json.load(file)
                 TAILNUMBER = str(argv[2])
                 data['tailnumber'] = TAILNUMBER
 
                 self._set_headers()
-                self.wfile.write(json.dumps(data).encode('utf-8'))
+                json_text=json.dumps(data).encode('utf-8')
+                self.wfile.write(json_text)
+            logging.info("Sending JSON")
+            send_msg(str(json_text))
 
-                file.close()
 
     # POST writes data to log and returns the data written
     def do_POST(self):
@@ -91,6 +116,9 @@ def server():
         print('> python server.py PORT TAILNUMBER API_IP API_PORT')
         exit()
 
+#send_msg("Hello world")
+#send_file("test.txt")
+
 
 if __name__ == '__main__':
     PORT = int(argv[1])
@@ -106,7 +134,3 @@ if __name__ == '__main__':
 
     server_thread.join()
     check_in_thread.join()
-
-
-
-
