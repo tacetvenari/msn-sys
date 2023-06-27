@@ -23,6 +23,13 @@ services:
       - VITE_WS_MX_PATH=mx-dashboard
       - VITE_WS_MX_CONTROL_PATH=mx-controller
 
+  cpe:
+    image: mx-cpe
+    build:
+      context: .
+      target: cpe
+    ports:
+      - "1001:8080"
 
   msn-api:
     image: tv-msn-api-server
@@ -97,7 +104,7 @@ services:
       - "1020:8888"
     environment:
       - VITE_DATA_SERVERS=http://mx-data-1:8008 http://mx-data-2:8008 http://mx-data-3:8008 http://mx-data-4:8008
-     
+
   mx-data-1:
     image: tv-mx-data-server
     build:
@@ -134,4 +141,3 @@ services:
       - "1024:8008"
     command: make start p=8008 t=tv-06
 
-    
