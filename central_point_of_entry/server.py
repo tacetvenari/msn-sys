@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib import parse
 import base64
 import json
-import socket
+import logging
 from sys import argv
 
 class Server(BaseHTTPRequestHandler):
@@ -19,8 +19,7 @@ class Server(BaseHTTPRequestHandler):
         if self.path == "/":
             with open('log', 'a') as log:
                 content = self.rfile.read(int(self.headers.get("Content-Length")))
-                log.write(f'{content.decode()}\n')
-
+                logging.info("received")
                 self._set_headers()
                 self.wfile.write(content)
 
@@ -48,7 +47,7 @@ class Server(BaseHTTPRequestHandler):
             self._set_headers()
             self.wfile.write(json.dumps(message).encode('utf-8'))
 
-def run(server_class=HTTPServer, handler_class=Server, port='8008', name='unk'):
+def run(server_class=HTTPServer, handler_class=Server, port=8008, name='unk'):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
@@ -57,16 +56,18 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', name='unk'):
 
 
 if __name__ == '__main__':
-    PORT = int(argv[1])
-    NAME = str(argv[2])
+
 
     try:
+        PORT = int(argv[1])
+        NAME = str(argv[2])
         run(port=PORT, name=NAME)
 
     except:
-        print('Missing args:')
-        print('> python server.py PORT SHOP API_IP API_PORT')
-        exit()
+        run()
+        #print('Missing args:')
+        #print('> python server.py PORT SHOP API_IP API_PORT')
+        #exit()
 
 
 
