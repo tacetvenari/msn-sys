@@ -8,26 +8,30 @@ from time import sleep
 from threading import Thread
 from websockets.sync.client import connect
 from sys import argv
-from os import stat
-from math import ceil
-from time import time
 from websockets.sync.client import connect
+from sys import stdout
+
+# Set logging for docker
+log = logging.getLogger('log')
+log.setLevel(logging.DEBUG)
+consoleHandler = logging.StreamHandler(stdout) #set streamhandler to stdout
+log.addHandler(consoleHandler)
 
 
-FILE_SIZE_LIMIT=1024
 CPE_SERVER="cpe"
 CPE_PORT="8080"
 
-def send_data(data, server, port):
-    with connect(f"ws://{server}:{port}") as websocket:
+def send_data(data, s, p):
+    log.info(f"===========  ws://{s}:{p}  ====================")
+    with connect(f"ws://{s}:{p}") as websocket:
         websocket.send(data)
-        print(f"Sending: {data}")
+        log.info(f"Sending: {data}")
         msg = websocket.recv()
-        print(f"Received: {msg}")
+        log.info(f"Received: {msg}")
 
-def send_msg(data, server, port):
+def send_msg(data, s, p):
     msg=json.dumps({"id":"msg", "data":data})
-    send_data(msg, server, port)
+    send_data(msg, s, p)
 
 
 
@@ -70,9 +74,14 @@ class Server(BaseHTTPRequestHandler):
 
                 self._set_headers()
                 json_text=json.dumps(data).encode('utf-8')
+                # Send to CPE
+                log.info("Sending JSON")
+                send_msg(str(json_text), CPE_SERVER, CPE_PORT)
+
+                # Write json
                 self.wfile.write(json_text)
-            logging.info("Sending JSON")
-            send_msg(str(json_text))
+
+
 
 
     # POST writes data to log and returns the data written
@@ -90,7 +99,7 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', tailnumber='
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
 
-    print('Starting MX Data Server on port %d...' % port)
+    log.info('Starting MX Data Server on port %d...' % port)
     httpd.serve_forever()
 
 def check_in(test, PORT, NAME, API_IP, API_PORT):
@@ -114,12 +123,10 @@ def server():
     try:
         run(port=PORT, tailnumber=TAILNUMBER)
     except:
-        print('Missing args:')
-        print('> python server.py PORT TAILNUMBER API_IP API_PORT')
+        log.error('Missing args:')
+        log.error('> python server.py PORT TAILNUMBER API_IP API_PORT CPE_IP CPE_PORT')
         exit()
 
-#send_msg("Hello world")
-#send_file("test.txt")
 
 
 if __name__ == '__main__':
@@ -128,8 +135,8 @@ if __name__ == '__main__':
     API_IP = argv[3]
     API_PORT = argv[4]
     try:
-        CPE_SERVER=argv[3]
-        CPE_PORT=argv[4]
+        CPE_SERVER=argv[5]
+        CPE_PORT=argv[6]
     except:
         pass
 
