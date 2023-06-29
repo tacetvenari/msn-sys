@@ -7,15 +7,23 @@ import os
 import websockets
 
 MSN_DATA_FILE = 'msn-data.json'
-DATA_SERVERS = [
-        {"name": "bcd",   "url": "http://localhost:8012"},
-        {"name": "gccs",  "url": "http://localhost:8013"},
-        {"name": "iamd",  "url": "http://localhost:8014"},
-        {"name": "intel", "url": "http://localhost:8015"},
-        {"name": "freq",  "url": "http://localhost:8016"},
-        {"name": "wx",    "url": "http://localhost:8017"},
-]
+# DATA_SERVERS = [
+#         {"name": "bcd",   "url": "http://localhost:8012"},
+#         {"name": "gccs",  "url": "http://localhost:8013"},
+#         {"name": "iamd",  "url": "http://localhost:8014"},
+#         {"name": "intel", "url": "http://localhost:8015"},
+#         {"name": "freq",  "url": "http://localhost:8016"},
+#         {"name": "wx",    "url": "http://localhost:8017"},
+# ]
 
+DATA_SERVERS = [
+        {"name": "bcd",   "url": "http://msn-data-1:8012"},
+        {"name": "gccs",  "url": "http://msn-data-2:8012"},
+        {"name": "iamd",  "url": "http://msn-data-3:8012"},
+        {"name": "intel", "url": "http://msn-data-4:8012"},
+        {"name": "freq",  "url": "http://msn-data-5:8012"},
+        {"name": "wx",    "url": "http://msn-data-6:8012"},
+]
 
 # Connection channels
 connections = {

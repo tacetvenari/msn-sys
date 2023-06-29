@@ -7,11 +7,18 @@ import socket
 import websockets
 
 MX_DATA_FILE = 'mx-data.json'
+# DATA_SERVERS = [
+#     { "name": "tv-01", "url": "http://localhost:8008"},
+#     { "name": "tv-02", "url": "http://localhost:8009"},
+#     { "name": "tv-05", "url": "http://localhost:8010"},
+#     { "name": "tv-06", "url": "http://localhost:8011"},
+# ]
+
 DATA_SERVERS = [
-    { "name": "tv-01", "url": "http://localhost:8008"},
-    { "name": "tv-02", "url": "http://localhost:8009"},
-    { "name": "tv-05", "url": "http://localhost:8010"},
-    { "name": "tv-06", "url": "http://localhost:8011"},
+    { "name": "tv-01", "url": "http://mx-data-1:8008"},
+    { "name": "tv-02", "url": "http://mx-data-2:8008"},
+    { "name": "tv-05", "url": "http://mx-data-3:8008"},
+    { "name": "tv-06", "url": "http://mx-data-4:8008"},
 ]
 
 # Connection channels

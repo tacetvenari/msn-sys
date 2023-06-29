@@ -3,7 +3,7 @@ LOCAL_IP=$$(python3 -c 'import socket; ip=socket.gethostbyname(socket.gethostnam
 WS_PORT=8889
 
 start:
-	python3 ./msn-api-server.py ${LOCAL_IP} ${WS_PORT}
+	python3 ./server.py ${LOCAL_IP} ${WS_PORT}
 
 control:
 	python3 -m websockets ws://${LOCAL_IP}:${WS_PORT}/msn-controller

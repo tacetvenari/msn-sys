@@ -15,17 +15,19 @@ from websockets.sync.client import connect
 
 
 FILE_SIZE_LIMIT=1024
+CPE_SERVER="cpe"
+CPE_PORT="8080"
 
-def send_data(data):
-    with connect("ws://127.0.0.1:8080") as websocket:
+def send_data(data, server, port):
+    with connect(f"ws://{server}:{port}") as websocket:
         websocket.send(data)
         print(f"Sending: {data}")
         msg = websocket.recv()
         print(f"Received: {msg}")
 
-def send_msg(data):
+def send_msg(data, server, port):
     msg=json.dumps({"id":"msg", "data":data})
-    send_data(msg)
+    send_data(msg, server, port)
 
 
 
@@ -125,6 +127,11 @@ if __name__ == '__main__':
     TAILNUMBER = str(argv[2])
     API_IP = argv[3]
     API_PORT = argv[4]
+    try:
+        CPE_SERVER=argv[3]
+        CPE_PORT=argv[4]
+    except:
+        pass
 
     server_thread=Thread(target=server)
     check_in_thread = Thread(target=check_in, args=[False, PORT, TAILNUMBER, API_IP, API_PORT])
