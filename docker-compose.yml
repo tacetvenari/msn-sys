@@ -22,6 +22,7 @@ services:
       - VITE_WS_MX_PORT=8888
       - VITE_WS_MX_PATH=mx-dashboard
       - VITE_WS_MX_CONTROL_PATH=mx-controller
+      - VITE_WS_MX_SORTIE_PATH=mx-sortie-state
 
   cpe:
     image: mx-cpe
