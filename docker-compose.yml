@@ -22,7 +22,15 @@ services:
       - VITE_WS_MX_PORT=8888
       - VITE_WS_MX_PATH=mx-dashboard
       - VITE_WS_MX_CONTROL_PATH=mx-controller
+      - VITE_WS_MX_SORTIE_PATH=mx-sortie-state
 
+  cpe:
+    image: mx-cpe
+    build:
+      context: .
+      target: cpe
+    ports:
+      - "1001:8080"
 
   msn-api:
     image: tv-msn-api-server
@@ -30,7 +38,7 @@ services:
       context: .
       target: msn-api-server
     ports:
-      - "1010:8889"
+      - "8889:8889"
     environment:
       - VITE_DATA_SERVERS=http://msn-data-1:8012 http://msn-data-2:8012 http://msn-data-3:8012 http://msn-data-4:8012 http://msn-data-5:8012 http://msn-data-6:8012
 
@@ -94,10 +102,10 @@ services:
       context: .
       target: mx-api-server
     ports:
-      - "1020:8888"
+      - "8888:8888"
     environment:
       - VITE_DATA_SERVERS=http://mx-data-1:8008 http://mx-data-2:8008 http://mx-data-3:8008 http://mx-data-4:8008
-     
+
   mx-data-1:
     image: tv-mx-data-server
     build:
@@ -134,4 +142,3 @@ services:
       - "1024:8008"
     command: make start p=8008 t=tv-06
 
-    

@@ -3,6 +3,14 @@ from urllib import parse
 import base64
 import json
 import shutil
+import socket
+from time import sleep
+from threading import Thread
+from websockets.sync.client import connect
+from sys import argv
+
+CHECKIN_TIMER=5
+IPADDR=socket.gethostbyname(socket.gethostname())
 
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
@@ -20,7 +28,7 @@ class Server(BaseHTTPRequestHandler):
     def do_HEAD(self):
         self._set_headers()
 
-    # GET sends back a Hello world message
+    # GET returns MSN JSON data based on path
     def do_GET(self):
         files = {
             "/": "msn-data.json",
@@ -31,13 +39,13 @@ class Server(BaseHTTPRequestHandler):
             return False
         elif self.path == "/restore": # Restore backup data
             print("Restoring data...")
-            message = { "message" : "MSN Data Servers mission data restored"}
+            message = { "message" : "Restore complete"}
 
             shutil.copy(files['/restore'], files['/']) # Overwrite data with backup
 
             self._set_headers()
             self.wfile.write(json.dumps(message).encode('utf-8'))
-        else:
+        else: # Respond with JSON
             with open(files[self.path]) as file:
                 data = {}
                 shopData = json.load(file)
@@ -53,9 +61,10 @@ class Server(BaseHTTPRequestHandler):
 
                 file.close()
 
+    # POST writes data to log and returns the data written
     def do_POST(self):
         if self.path == "/":
-            with open("log", "a") as log:
+            with open('log', 'a') as log:
                 content = self.rfile.read(int(self.headers.get("Content-Length")))
                 log.write(f'{content.decode()}\n')
 
@@ -94,14 +103,48 @@ def run(server_class=HTTPServer, handler_class=Server, port='8008', shop='unk'):
     print('Starting %s Data Server on port %d...' % (shop.upper(), port))
     httpd.serve_forever()
 
-if __name__ == '__main__':
-    from sys import argv
+def check_in(test, PORT, NAME, API_IP, API_PORT):
+    while True:
+        sleep(CHECKIN_TIMER)
+        # Connect to the API Server
+        with connect(f"ws://{API_IP}:{API_PORT}/check-in") as websocket:
+        # Send Command to check-in
+            websocket.send(f"check-in {IPADDR} {PORT} {NAME}")
+            message=""
+            while True:
+                if ("FAIL" in message) or ("CLOSE" == message):
+                    break
+                message = websocket.recv()
+                # Receive/Handle Errors
+                print(f"Received: {message}")
+        if test == True:
+            break
 
+def server():
     try:
-        PORT = int(argv[1])
-        SHOP = str(argv[2])
         run(port=PORT, shop=SHOP)
 
     except:
         print('Missing args:')
-        print('> python3 data-server.py [PORT] [SHOP]')
+        print('> python server.py PORT SHOP API_IP API_PORT')
+        exit()
+
+
+if __name__ == '__main__':
+    PORT = int(argv[1])
+    SHOP = str(argv[2])
+    API_IP = argv[3]
+    API_PORT = argv[4]
+
+    server_thread=Thread(target=server)
+    check_in_thread = Thread(target=check_in, args=[False, PORT, SHOP, API_IP, API_PORT])
+
+    server_thread.start()
+    check_in_thread.start()
+
+    server_thread.join()
+    check_in_thread.join()
+
+
+
+

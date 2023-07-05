@@ -6,20 +6,27 @@ import os
 import socket
 import websockets
 
-
 MX_DATA_FILE = 'mx-data.json'
+# DATA_SERVERS = [
+#     { "name": "tv-01", "url": "http://localhost:8008"},
+#     { "name": "tv-02", "url": "http://localhost:8009"},
+#     { "name": "tv-05", "url": "http://localhost:8010"},
+#     { "name": "tv-06", "url": "http://localhost:8011"},
+# ]
+
 DATA_SERVERS = [
-    { "name": "tv-01", "url": "http://localhost:8008"},
-    { "name": "tv-02", "url": "http://localhost:8009"},
-    { "name": "tv-05", "url": "http://localhost:8010"},
-    { "name": "tv-06", "url": "http://localhost:8011"},
+    { "name": "tv-01", "url": "http://mx-data-1:8008"},
+    { "name": "tv-02", "url": "http://mx-data-2:8008"},
+    { "name": "tv-05", "url": "http://mx-data-3:8008"},
+    { "name": "tv-06", "url": "http://mx-data-4:8008"},
 ]
 
 # Connection channels
 connections = {
     '/mx-controller': set(),
     '/mx-dashboard': set(),
-    '/mx-sortie-state': set()
+    '/mx-sortie-state': set(),
+    '/check-in': set()
 }
 
 # Build MX data from data servers; Path determines source file to build from
@@ -28,6 +35,7 @@ def build_mx_data(path='/'):
         msn_data_file.write(f"[\n")
         for idx, data_server in enumerate(DATA_SERVERS):
             try:
+                print(f">>{data_server['url']}{path}")
                 content = urlopen(f"{data_server['url']}{path}").read().decode()
                 if (idx + 1) == len(DATA_SERVERS):
                     msn_data_file.write(f"{content}\n")
@@ -81,10 +89,53 @@ async def socket_handler(websocket, path):
             elif message == "sortie-canx":
                 websockets.broadcast(connections['/mx-sortie-state'], "canx")
                 websockets.broadcast(connections['/mx-controller'], "Sortie state: CANXD")
+            elif message[0:8] == 'check-in':
+                await check_in(message)
 
     finally:
         # Unregister connection
         connections[path].remove(websocket)
+
+async def check_in(message):
+    # Test Brodcast
+    websockets.broadcast(connections['/check-in'], "Checking in")
+
+    # Split message on spaces
+    cmd=message.split(" ")
+
+    # Check if enough arguments
+    if len(cmd) != 4:
+        help_msg= \
+        '''Invalid number of arguments:
+        check-in IP_ADDR PORT SYSTEM_NAME'''
+        websockets.broadcast(connections['/check-in'], help_msg)
+        return
+    # Does Data server exist?
+    d_server = next((item for item in DATA_SERVERS if item["name"] == cmd[3]), False)
+    if d_server == False:
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[3]}\' is not a valid data server")
+        return
+    # Is IP valid?
+    ip=cmd[1].split(".")
+    if not (len(ip) == 4 and \
+        int(ip[0]) in range(0,255) and \
+        int(ip[1]) in range(0,255) and \
+        int(ip[2]) in range(0,255) and \
+        int(ip[3]) in range(0,255)):
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[1]}\' is not a valid ip_address")
+        return
+    # Is Port valid?
+    if not (int(cmd[2]) in range(0,65535)):
+        websockets.broadcast(connections['/check-in'], f"FAIL: \'{cmd[2]}\' is not a valid port")
+        return
+
+    # Check-in the Data server
+    d_server['url']=f"http://{cmd[1]}:{cmd[2]}"
+    # print(DATA_SERVERS)
+    websockets.broadcast(connections['/check-in'], f"Checked in {d_server}")
+    websockets.broadcast(connections['/check-in'], "CLOSE")
+
+
 
 async def main(local_ip='localhost', port=8888):
     print(f'Starting websocket server at {local_ip}:{port}...')
